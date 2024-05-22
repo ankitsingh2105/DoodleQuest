@@ -8,8 +8,7 @@ export default function Chat(props) {
   const [allMessages, setAllMessages] = useState([]);
 
   const sendMessage = async () => {
-    // if (message === "") return; 
-
+    if (message === "") return; 
     const messageData = {
       name,
       message,
@@ -18,12 +17,10 @@ export default function Chat(props) {
     };
 
     newSocket.current.emit("sendMessage", messageData);
-    // setMessage(""); // Clear input field after sending the message
   };
 
   useEffect(() => {
     const handleMessages = ({ name, message }) => {
-      console.log("getting message");
       setAllMessages((currentMessages) => [...currentMessages, { name, message }]);
     };
 

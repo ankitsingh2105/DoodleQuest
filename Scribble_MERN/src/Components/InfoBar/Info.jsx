@@ -37,7 +37,6 @@ export default function Info(props) {
     const fetchUsers = async () => {
       try {
         let response = await axios.get("http://localhost:8000/userList");
-        console.log("Response from server:", response.data);
         setPlayers(response.data);
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -72,7 +71,6 @@ export default function Info(props) {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve();
-        console.log("After 25 seconds");
       }, 25000);
     });
   }
@@ -85,7 +83,6 @@ export default function Info(props) {
 
       setrandom(Math.floor(Math.random() * 5));
 
-      console.log("opwara 21 :: :: >> ", name, currentPlayer.userName);
       if (currentPlayer.userName === name) {
         setCountdown(5);
         setDrawTime(25);
@@ -101,7 +98,6 @@ export default function Info(props) {
         whoDrawingNow.current.style.display = "flex";
         whoDrawingNow.current.style.justifyContent = "center";
       }
-      console.log(index + 1, " and ", players.length)
     };
 
     const dummy = async () => {
@@ -118,8 +114,6 @@ export default function Info(props) {
     let loopCount = players.length;
     let currentIteration = 0;
 
-    console.log("players are in the info", players);
-    console.log("loop size is", loopCount);
     await newSocket.current.emit('myEvent', currentIteration);
 
     const interval = setInterval(async () => {
@@ -128,7 +122,6 @@ export default function Info(props) {
         await newSocket.current.emit('myEvent', currentIteration);
       }
       else {
-        console.log("Current and triggered", currentIteration, loopCount)
         clearInterval(interval);
       }
     }, 25000);
@@ -139,11 +132,8 @@ export default function Info(props) {
   const handleEnter = async (e) => {
     setUserWithGuess(name);
     if (e.key === 'Enter') {
-      console.log("Emtered and word is ", item, answer);
       if (item === answer) {
         toast("Right Answer, points updated")
-        console.log("op Player ---- ", name, " ----");
-        console.log("updating req form client for namw == ", name);
         newSocket.current.emit("updatePlayerPoints", { name, drawTime })
       }
       else {
@@ -167,7 +157,6 @@ export default function Info(props) {
   useEffect(() => {
     const handleNewPlayer = async (player) => {
       let response = await axios.get("http://localhost:8000/userList");
-      console.log(response.data);
       setplayer(response.data)
     }
 

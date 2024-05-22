@@ -78,7 +78,6 @@ io.on("connection", (client) => {
     // todo :: choosing the players
     client.on('myEvent', (currentIteration) => {
         console.log(`Received from ${client.id}:`, currentIteration);
-        // Emit an acknowledgment back to the client
         io.emit('acknowledgement', currentIteration);
     });
 

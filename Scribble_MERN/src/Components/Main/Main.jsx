@@ -11,8 +11,6 @@ export default function Main() {
     const [searchParams] = useSearchParams();
     const room = searchParams.get('roomID');
     const name = searchParams.get("name");
-    console.log("Main Name :: ", name)
-
     const socket = useRef(io.connect("http://localhost:8000"));
     const canvasRef = useRef(null);
     const contextRef = useRef(null);
@@ -52,7 +50,6 @@ export default function Main() {
     useEffect(() => {
         const handleNewPlayer = async (player) => {
             let response = await axios.get("http://localhost:8000/userList");
-            console.log(response.data);
             setplayers(response.data)
         }
         socket.current.on("newPlayer", handleNewPlayer)

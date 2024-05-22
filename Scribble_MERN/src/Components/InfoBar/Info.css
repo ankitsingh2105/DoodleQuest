@@ -1,0 +1,91 @@
+.info_Main{
+    background-color: antiquewhite;
+    width: 1047px;
+    height: 40px;
+    margin-top: 10px; 
+    display: flex;
+    align-items: center;
+    justify-content:space-between;
+}
+.info_Main section{
+    margin: 0px 10px;
+}
+
+.info_Main section input{
+    padding: 5px;
+}
+
+
+.askQuestions{
+    position: fixed;
+    top: 10px;
+    left: 35%;
+    right: 35%;
+    top: 30%;
+    background-color: rgb(250, 255, 99);
+    padding-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    display: none;
+}
+.choosingTime{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 5px 10px;
+    background-color: red;
+    border: 1px solid black;
+    border-radius: 40px;
+}
+
+.select{
+    display: flex;
+    justify-content: center;
+}
+.select div{
+    margin: 0px 20px;
+}
+.select div:hover{
+    cursor: pointer;
+}
+.whoDrawing{
+    background-color: red;
+    display: none;
+}
+
+
+.winners{
+    position: fixed;
+    top: 10%;
+    left:  40%;
+    right: 40%;
+    padding: 10px;
+    display: none;
+}
+
+.winnerInfo div{
+    padding: 10px 0px;
+}
+
+.winnerInfo:nth-child(odd){
+    background-color: lightgreen;
+}
+.winnerInfo:nth-child(even){
+    background-color:antiquewhite;
+}
+
+.main_Info input{
+    font-size: 18px;
+}
+
+.main_Info button{
+    font-size: 18px;
+    background-color: rgb(255, 1, 35);
+    color: white;
+}
+.time, .choosingTime{
+    font-size: 18px;
+}
+body, body button, body input{
+    font-size: 18px;
+}

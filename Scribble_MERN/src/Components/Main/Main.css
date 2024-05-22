@@ -1,0 +1,19 @@
+.align{
+    display: flex;
+    align-items:flex-start;
+    justify-content: center;
+}
+.align section{
+    margin: 0px 10px;
+}
+
+.Main_main{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.Main_main{
+    background-color: rgb(255, 132, 132);
+    background-color: rgb(219, 255, 156);
+}

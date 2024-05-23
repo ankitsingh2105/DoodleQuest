@@ -14,8 +14,6 @@ const io = new Server(server, {
         origin: "http://localhost:5173",
     }
 });
-
- 
 app.get('/userList', async (req, res) => {
     try {
         const users = await User.find();
@@ -26,12 +24,13 @@ app.get('/userList', async (req, res) => {
 });
 
 io.on("connection", (client) => {
-    console.log(`New user ::${client.id}`); 
+    console.log(`New user ::${client.id}`);
 
-    client.on("disconnect", () => { 
+    client.on("disconnect", () => {
         console.log("user disconnected ::", client.id);
 
-    });  
+    });
+
 
     client.on("join-room", async (info) => {
         const { room, name } = info;
@@ -48,14 +47,13 @@ io.on("connection", (client) => {
         catch (error) {
             console.log("Something went wrong");
         }
-        io.to(room).emit("newPlayer", (name));
-        io.emit("updateArray", (name));
+        io.to(room).emit("newPlayer");
     });
 
     client.on("draw", ({ room, offsetX, offsetY, color }) => {
         io.to(room).emit("draw", { offsetX, offsetY, color });
     });
- 
+
 
     client.on("stopDrawing", (room) => {
         io.to(room).emit("stopDrawing", room);
@@ -82,8 +80,8 @@ io.on("connection", (client) => {
     });
 
     // todo :: word to find
-    client.on("wordToGuess", (info) => { 
-        console.log("info is :: ", info) 
+    client.on("wordToGuess", (info) => {
+        console.log("info is :: ", info)
         io.emit("wordToGuess", info);
     })
 
@@ -108,6 +106,17 @@ io.on("connection", (client) => {
         io.emit("updatePlayerPoints", "info");
     })
 
+    // todo :: client reloaded, moved back, closed the page
+    client.on("disconnectUser", async ({ name, room }) => {
+        try {
+            await User.deleteOne({ userName: name, room: room });
+            console.log(`User ${name} has been deleted from room ${room}`);
+        } 
+        catch (error) {
+            console.log('Error deleting user:', error);
+        }
+        io.to(room).emit("newPlayer");
+    })
 
 });
 

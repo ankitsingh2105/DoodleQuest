@@ -31,7 +31,6 @@ export default function Join() {
                     <Link style={{
                         color: "black",
                         fontStyle: "none",
-                        color: "black"
                     }} to={`/room?roomID=${room}&name=${userName}`} >Join Room</Link>
                 </button>
             </center>

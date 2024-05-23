@@ -6,6 +6,7 @@ import Chat from '../Chat/Chat';
 import Players from '../Players/Players';
 import Info from '../InfoBar/Info';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 export default function Main() {
     const [searchParams] = useSearchParams();
@@ -17,6 +18,15 @@ export default function Main() {
     const [isDrawing, setIsDrawing] = useState(false);
     const [color, setColor] = useState('#000000');
     const [players, setplayers] = useState([])
+
+    
+    const handleOnoad = async(event) => {
+        await socket.current.emit("disconnectUser", { name, room });
+        window.location.href = "/";
+    };
+
+    window.addEventListener("load", handleOnoad);
+
 
     useEffect(() => {
         socket.current = io.connect("http://localhost:8000");

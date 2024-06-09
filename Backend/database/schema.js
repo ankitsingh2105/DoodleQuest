@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
     userName: String,
     userId: String,
     points: Number,
-    room : String
+    room : String 
 }); 
 
 

@@ -36,7 +36,7 @@ export default function Info(props) {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        let response = await axios.get("http://localhost:8000/userList");
+        let response = await axios.get("https://doodlequest-8.onrender.com/userList");
         setPlayers(response.data);
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -156,7 +156,7 @@ export default function Info(props) {
 
   useEffect(() => {
     const handleNewPlayer = async (player) => {
-      let response = await axios.get("http://localhost:8000/userList");
+      let response = await axios.get("https://doodlequest-8.onrender.com/userList");
       setplayer(response.data)
     }
 

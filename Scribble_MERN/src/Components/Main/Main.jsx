@@ -12,7 +12,7 @@ export default function Main() {
     const [searchParams] = useSearchParams();
     const room = searchParams.get('roomID');
     const name = searchParams.get("name");
-    const socket = useRef(io.connect("http://localhost:8000"));
+    const socket = useRef(io.connect("https://doodlequest-8.onrender.com/"));
     const canvasRef = useRef(null);
     const contextRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
@@ -29,7 +29,7 @@ export default function Main() {
 
 
     useEffect(() => {
-        socket.current = io.connect("http://localhost:8000");
+        socket.current = io.connect("https://doodlequest-8.onrender.com/");
         socket.current.emit("join-room", { room, name });
 
         socket.current.on("draw", ({ offsetX, offsetY, color }) => {
@@ -59,7 +59,7 @@ export default function Main() {
 
     useEffect(() => {
         const handleNewPlayer = async (player) => {
-            let response = await axios.get("http://localhost:8000/userList");
+            let response = await axios.get("https://doodlequest-8.onrender.com/userList");
             setplayers(response.data)
         }
         socket.current.on("newPlayer", handleNewPlayer)

@@ -25,10 +25,14 @@ app.get('/userList', async (req, res) => {
     }
 });
 
+app.get("/" , (req , response)=>{
+    response.send("Live Now")
+})
+
 io.on("connection", (client) => {
     console.log(`New user ::${client.id}`);
 
-    client.on("disconnect", () => {
+    client.on("disconnect", () => { 
         console.log("user disconnected ::", client.id);
 
     });

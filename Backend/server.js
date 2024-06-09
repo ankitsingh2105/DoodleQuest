@@ -12,8 +12,8 @@ const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
         origin: "http://localhost:5173",
-        methods :  ["POST", "GET"],
-        credentials : true
+        methods: ["POST", "GET"],
+        credentials: true
     }
 });
 app.get('/userList', async (req, res) => {
@@ -113,7 +113,7 @@ io.on("connection", (client) => {
         try {
             await User.deleteOne({ userName: name, room: room });
             console.log(`User ${name} has been deleted from room ${room}`);
-        } 
+        }
         catch (error) {
             console.log('Error deleting user:', error);
         }
@@ -122,6 +122,6 @@ io.on("connection", (client) => {
 
 });
 
-server.listen(8000, () => {
+server.listen(process.env.PORT , () => {
     console.log("Server Running on port 8000");
 });

@@ -12,8 +12,6 @@ const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
         origin: "https://doodlequest.vercel.app",
-        methods: ["POST", "GET"],
-        credentials: true
     }
 });
 app.get('/userList', async (req, res) => {

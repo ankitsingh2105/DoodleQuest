@@ -4,7 +4,8 @@
   "description": "Player will draw and other will guess",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start"  : "node server.js"
   },
   "author": "Ankit Singh Chauhan",
   "license": "ISC",

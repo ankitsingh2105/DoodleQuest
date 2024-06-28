@@ -17,6 +17,29 @@ This project is a multiplayer drawing and guessing game inspired by Scribble. It
 - **Exploring Web Sockets:** Discovered the fascinating realm of real-time communication and its efficiency in maintaining persistent connections.
 - **Custom Promises:** Delved into the intricacies of promises in asynchronous JavaScript and crafted custom promises to handle asynchronous operations effectively.
 
+## Running the Server and Frontend
+
+## Server
+- Open a new terminal.
+
+- Navigate to the `backend` directory:
+   ```bash
+   cd Backend
+
+- Run:
+   ```bash
+   nodemon server.js
+
+## FrontEnd
+- Open a new terminal.
+
+- Navigate to the `Scribble_MERN` directory:
+   ```bash
+   cd Scribble_MERN
+
+- Run:
+   ```bash
+   npm run dev
+
 ## About the Author
 - **Ankit Singh Chauhan:** Visit [ankitsinghchauhan.in](https://ankitsinghchauhan.in) for more.
-

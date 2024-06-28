@@ -7,67 +7,73 @@ import Players from '../Players/Players';
 import Info from '../InfoBar/Info';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-
+import backendLink from '../../../backendlink';
+import websocket from '../../../socket';
 export default function Main() {
     const [searchParams] = useSearchParams();
     const room = searchParams.get('roomID');
     const name = searchParams.get("name");
-    const socket = useRef(io.connect("https://doodlequest-9.onrender.com/"));
+    const socket = useRef(websocket);
     const canvasRef = useRef(null);
     const contextRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [color, setColor] = useState('#000000');
     const [players, setplayers] = useState([])
-
+    
     
     const handleOnoad = async(event) => {
         await socket.current.emit("disconnectUser", { name, room });
-        window.location.href = "/";
+        window.location.href = "/"
     };
 
     window.addEventListener("load", handleOnoad);
 
 
     useEffect(() => {
-        socket.current = io.connect("https://doodlequest-9.onrender.com/");
+        if (!socket.current) {
+            socket.current = io.connect(`${backendLink}`);
+        }
+    
         socket.current.emit("join-room", { room, name });
-
+    
         socket.current.on("draw", ({ offsetX, offsetY, color }) => {
             const context = contextRef.current;
             context.strokeStyle = color;
             context.lineTo(offsetX, offsetY);
             context.stroke();
         });
-
+    
         socket.current.on("clear", ({ width, height }) => {
             const canvas = canvasRef.current;
             const context = contextRef.current;
             context.clearRect(0, 0, canvas.width, canvas.height);
             context.clearRect(0, 0, width, height);
-            context.beginPath()
+            context.beginPath();
         });
-
+    
         socket.current.on("stopDrawing", () => {
             const context = contextRef.current;
-            context.closePath()
+            context.closePath();
         });
-
+    
+        // todo :: Cleanup function: disconnect socket when component unmounts or when room changes
         return () => {
-            socket.current.disconnect();
+            // if (socket.current) {
+                socket.current.disconnect();
+                // socket.current = null; // Reset socket reference
+            // }
         };
-    }, [room]);
+    }, [room]); 
+    
 
     useEffect(() => {
         const handleNewPlayer = async (player) => {
-            let response = await axios.get("https://doodlequest-9.onrender.com/userList");
+            let response = await axios.get(`${backendLink}/userList`);
             setplayers(response.data)
         }
         socket.current.on("newPlayer", handleNewPlayer)
-        return () => {
-            socket.current.off("newPlayer", handleNewPlayer);
-        }
     }, [socket.current])
-
+ 
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -76,6 +82,12 @@ export default function Main() {
         context.strokeStyle = color;
         context.lineWidth = 5;
         contextRef.current = context;
+        return () => {
+            if (socket.current) {
+                socket.current.disconnect();
+                socket.current = null; 
+            }
+        };
     }, [color]);
 
     const startDrawing = ({ nativeEvent }) => {
@@ -131,7 +143,7 @@ export default function Main() {
             <main className="Main_main">
 
                 <section className='info_tab'>
-                    <Info setplayer={setplayers} player={players} name={name} room={room} socket={socket} />
+                    <Info setplayer={setplayers} player={players} name={name} room={room} socket={socket.current} />
                 </section>
 
                 <section className='align'>

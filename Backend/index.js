@@ -9,10 +9,10 @@ const { Server } = require("socket.io");
 
 const server = http.createServer(app);
 
+// origin: "https://doodlequest.vercel.app",
 const io = new Server(server, {
     cors: {
-        origin: "https://doodlequest.vercel.app",
-        
+        origin: "http://localhost:5173",
     }
 });
 app.get('/userList', async (req, res) => {
@@ -31,11 +31,19 @@ app.get("/" , (req , response)=>{
 io.on("connection", (client) => {
     console.log(`New user ::${client.id}`);
 
-    client.on("disconnect", () => { 
+    client.on("disconnect", async() => { 
         console.log("user disconnected ::", client.id);
-
+        try{
+            await User.deleteOne({webSocketID : client.id});
+            console.log("user deleted ::", client.id);
+            io.emit("newPlayer");
+        }
+        catch(error){
+            console.log(" error :: " , error);
+        }
+        
     });
-
+ 
 
     client.on("join-room", async (info) => {
         const { room, name } = info;
@@ -44,11 +52,11 @@ io.on("connection", (client) => {
         try {
             await User.create({
                 userName: name,
-                userId: client.id,
-                points: 0,
-                room
+                webSocketID: client.id,
+                points: 0, 
+                room,
             })
-        }
+        }    
         catch (error) {
             console.log("Something went wrong");
         }
@@ -62,7 +70,7 @@ io.on("connection", (client) => {
 
     client.on("stopDrawing", (room) => {
         io.to(room).emit("stopDrawing", room);
-    });
+    });        
 
     client.on("clear", ({ room, width, height }) => {
         io.to(room).emit("clear", { width, height });
@@ -124,7 +132,7 @@ io.on("connection", (client) => {
     })
 
 });
-
-server.listen(process.env.PORT , () => {
-    console.log("Server Running on port 8000");
+const PORT = process.env.PORT || 3000;
+server.listen(3000 , () => {
+    console.log("Server Running on port 3000");
 });

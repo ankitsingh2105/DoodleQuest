@@ -4,10 +4,12 @@ import axios from 'axios';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import backendLink from '../../../backendlink';
+
 
 export default function Info(props) {
   const { socket, player, name, setplayer } = props;
-  const newSocket = useRef(socket.current);
+  // const socket = useRef(socket);
 
   const [answer, setAnswer] = useState("");
   const [item, setItem] = useState("");
@@ -36,7 +38,7 @@ export default function Info(props) {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        let response = await axios.get("https://doodlequest-9.onrender.com/userList");
+        let response = await axios.get(`${backendLink}/userList`);
         setPlayers(response.data);
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -101,25 +103,27 @@ export default function Info(props) {
     };
 
     const dummy = async () => {
-      newSocket.current.on('acknowledgement', handleAcknowledgement);
+      socket.on('acknowledgement', handleAcknowledgement);
     };
     dummy();
 
-    return () => {
-      newSocket.current.off('acknowledgement');
+    return () => { 
+      socket.off('acknowledgement');
     };
   }, [players, name]);
 
   const StartGame = async () => {
     let loopCount = players.length;
     let currentIteration = 0;
-
-    await newSocket.current.emit('myEvent', currentIteration);
+    console.log(socket);
+    console.log(socket);
+    console.log(socket.on);
+    await socket.emit('myEvent', currentIteration);
 
     const interval = setInterval(async () => {
       if (currentIteration < loopCount - 1) {
         currentIteration++;
-        await newSocket.current.emit('myEvent', currentIteration);
+        await socket.emit('myEvent', currentIteration);
       }
       else {
         clearInterval(interval);
@@ -134,10 +138,10 @@ export default function Info(props) {
     if (e.key === 'Enter') {
       if (item === answer) {
         toast("Right Answer, points updated")
-        newSocket.current.emit("updatePlayerPoints", { name, drawTime })
+        socket.emit("updatePlayerPoints", { name, drawTime })
       }
       else {
-        toast("Wrong Guess")
+        toast(`Wrong Guess , ${item} and ${answer} `)
       }
     }
   };
@@ -145,30 +149,31 @@ export default function Info(props) {
 
   useEffect(() => {
     const handleGuesstingWord = async (info) => {
+      console.log("this si the pro :: " , info);
       setItem(info[0]);
     }
-    newSocket.current.on("wordToGuess", handleGuesstingWord);
+    socket.on("wordToGuess", handleGuesstingWord);
     return () => {
-      newSocket.current.on("wordToGuess", handleGuesstingWord);
+      socket.off("wordToGuess", handleGuesstingWord);
     }
-  }, [item])
+  }, [item, socket])
 
 
   useEffect(() => {
     const handleNewPlayer = async (player) => {
-      let response = await axios.get("https://doodlequest-9.onrender.com/userList");
+      let response = await axios.get(`${backendLink}/userList`);
       setplayer(response.data)
     }
 
     const dummy = async () => {
-      newSocket.current.on('updatePlayerPoints', handleNewPlayer);
+      socket.on('updatePlayerPoints', handleNewPlayer);
     };
     dummy();
 
     return () => {
-      newSocket.current.off('updatePlayerPoints', handleNewPlayer);
+      socket.off('updatePlayerPoints', handleNewPlayer);
     };
-  }, [userWithGuess, newSocket.current]);
+  }, [userWithGuess, socket]);
 
 
   return (
@@ -206,7 +211,7 @@ export default function Info(props) {
             <span className="select">
 
               <div onClick={async () => {
-                await newSocket.current.emit("wordToGuess", [wordArray[random]["1"]]);
+                await socket.emit("wordToGuess", [wordArray[random]["1"]]);
                 setItem(wordArray[random]["1"]);
                 questions.current.style.display = "none";
               }}>
@@ -214,7 +219,7 @@ export default function Info(props) {
               </div>
 
               <div onClick={async () => {
-                await newSocket.current.emit("wordToGuess", [wordArray[random]["2"]]);
+                await socket.emit("wordToGuess", [wordArray[random]["2"]]);
                 setItem(wordArray[random]["2"]);
                 questions.current.style.display = "none";
               }}>
@@ -222,7 +227,7 @@ export default function Info(props) {
               </div>
 
               <div onClick={async () => {
-                await newSocket.current.emit("wordToGuess", [wordArray[random]["3"]]);
+                await socket.emit("wordToGuess", [wordArray[random]["3"]]);
                 setItem(wordArray[random]["3"]);
                 questions.current.style.display = "none";
               }}>

@@ -19,9 +19,9 @@ export default function Main() {
     const [isDrawing, setIsDrawing] = useState(false);
     const [color, setColor] = useState('#000000');
     const [players, setplayers] = useState([])
-    
-    
-    const handleOnoad = async(event) => {
+
+
+    const handleOnoad = async (event) => {
         await socket.current.emit("disconnectUser", { name, room });
         window.location.href = "/"
     };
@@ -33,16 +33,16 @@ export default function Main() {
         if (!socket.current) {
             socket.current = io.connect(`${backendLink}`);
         }
-    
+
         socket.current.emit("join-room", { room, name });
-    
+
         socket.current.on("draw", ({ offsetX, offsetY, color }) => {
             const context = contextRef.current;
             context.strokeStyle = color;
             context.lineTo(offsetX, offsetY);
             context.stroke();
         });
-    
+
         socket.current.on("clear", ({ width, height }) => {
             const canvas = canvasRef.current;
             const context = contextRef.current;
@@ -50,21 +50,18 @@ export default function Main() {
             context.clearRect(0, 0, width, height);
             context.beginPath();
         });
-    
+
         socket.current.on("stopDrawing", () => {
             const context = contextRef.current;
             context.closePath();
         });
-    
+
         // todo :: Cleanup function: disconnect socket when component unmounts or when room changes
         return () => {
-            // if (socket.current) {
-                socket.current.disconnect();
-                // socket.current = null; // Reset socket reference
-            // }
+            socket.current.disconnect();
         };
-    }, [room]); 
-    
+    }, [room]);
+
 
     useEffect(() => {
         const handleNewPlayer = async (player) => {
@@ -73,7 +70,7 @@ export default function Main() {
         }
         socket.current.on("newPlayer", handleNewPlayer)
     }, [socket.current])
- 
+
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -85,7 +82,7 @@ export default function Main() {
         return () => {
             if (socket.current) {
                 socket.current.disconnect();
-                socket.current = null; 
+                socket.current = null;
             }
         };
     }, [color]);

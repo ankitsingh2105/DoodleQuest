@@ -15,35 +15,23 @@ const io = new Server(server, {
         origin: "https://doodlequest.vercel.app",
     }
 });
-app.get('/userList', async (req, res) => {
-    try {
-        const users = await User.find();
-        res.json(users);
-    } catch (error) {
-        res.status(500).send(error.message);
-    }
-});
-
-app.get("/" , (req , response)=>{
-    response.send("Live Now")
-})
 
 io.on("connection", (client) => {
     console.log(`New user ::${client.id}`);
 
-    client.on("disconnect", async() => { 
+    client.on("disconnect", async () => {
         console.log("user disconnected ::", client.id);
-        try{
-            await User.deleteOne({webSocketID : client.id});
+        try {
+            await User.deleteOne({ webSocketID: client.id });
             console.log("user deleted ::", client.id);
             io.emit("newPlayer");
         }
-        catch(error){
-            console.log(" error :: " , error);
+        catch (error) {
+            console.log(" error :: ", error);
         }
-        
+
     });
- 
+
 
     client.on("join-room", async (info) => {
         const { room, name } = info;
@@ -53,10 +41,10 @@ io.on("connection", (client) => {
             await User.create({
                 userName: name,
                 webSocketID: client.id,
-                points: 0, 
+                points: 0,
                 room,
             })
-        }    
+        }
         catch (error) {
             console.log("Something went wrong");
         }
@@ -70,7 +58,7 @@ io.on("connection", (client) => {
 
     client.on("stopDrawing", (room) => {
         io.to(room).emit("stopDrawing", room);
-    });        
+    });
 
     client.on("clear", ({ room, width, height }) => {
         io.to(room).emit("clear", { width, height });
@@ -132,7 +120,19 @@ io.on("connection", (client) => {
     })
 
 });
-const PORT = process.env.PORT || 3000;
-server.listen(3000 , () => {
-    console.log("Server Running on port 3000");
+app.get('/userList', async (req, res) => {
+    try {
+        const users = await User.find();
+        res.json(users);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+app.get("/", (req, response) => {
+    response.send("Live Now")
+})
+const PORT = process.env.PORT || 8000;
+server.listen(3000, () => {
+    console.log("Server Running on port 8000");
 });

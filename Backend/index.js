@@ -3,18 +3,28 @@ const app = express();
 const http = require("http");
 const cors = require("cors");
 const { User } = require("./database/schema");
-app.use(cors());
 
 const { Server } = require("socket.io");
 
 const server = http.createServer(app);
 // origin: "http://localhost:5173",
 
+const corsOptions = {
+    origin: "https://doodlequest.vercel.app",
+    methods: ["GET", "POST"],
+    credentials: true, // Allow credentials if needed
+};
+
+app.use(cors(corsOptions));
+
 const io = new Server(server, {
     cors: {
         origin: "https://doodlequest.vercel.app",
+        methods: ["GET", "POST"],
+        credentials: true,
     }
 });
+
 
 io.on("connection", (client) => {
     console.log(`New user ::${client.id}`);

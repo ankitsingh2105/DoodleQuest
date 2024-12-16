@@ -8,7 +8,7 @@ import backendLink from '../../../backendlink';
 
 
 export default function Info(props) {
-  const { socket, player, name, setplayer } = props;
+  const { socket, player, name, setplayer, room } = props;
   // const socket = useRef(socket);
 
   const [answer, setAnswer] = useState("");
@@ -39,7 +39,11 @@ export default function Info(props) {
     const fetchUsers = async () => {
       try {
         let response = await axios.get(`${backendLink}/userList`);
-        setPlayers(response.data);
+        console.log("this si the room :: ", room);
+        let playerdata = response.data.filter((e) => {
+          return e.room == room
+        })
+        setPlayers(playerdata);
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -107,7 +111,7 @@ export default function Info(props) {
     };
     dummy();
 
-    return () => { 
+    return () => {
       socket.off('acknowledgement');
     };
   }, [players, name]);
@@ -118,12 +122,12 @@ export default function Info(props) {
     console.log(socket);
     console.log(socket);
     console.log(socket.on);
-    await socket.emit('myEvent', currentIteration);
+    await socket.emit('myEvent', { currentIteration, room });
 
     const interval = setInterval(async () => {
       if (currentIteration < loopCount - 1) {
         currentIteration++;
-        await socket.emit('myEvent', currentIteration);
+        await socket.emit('myEvent', { currentIteration, room });
       }
       else {
         clearInterval(interval);
@@ -138,7 +142,7 @@ export default function Info(props) {
     if (e.key === 'Enter') {
       if (item === answer) {
         toast("Right Answer, points updated")
-        socket.emit("updatePlayerPoints", { name, drawTime })
+        socket.emit("updatePlayerPoints", { name, drawTime, room })
       }
       else {
         toast(`Wrong Guess , ${item} and ${answer} `)
@@ -147,22 +151,25 @@ export default function Info(props) {
   };
 
 
+  const handleGuesstingWord = async (word) => {
+    console.log("this is the word :: ", word);
+    setItem(word);
+  }
   useEffect(() => {
-    const handleGuesstingWord = async (info) => {
-      console.log("this si the pro :: " , info);
-      setItem(info[0]);
-    }
     socket.on("wordToGuess", handleGuesstingWord);
     return () => {
       socket.off("wordToGuess", handleGuesstingWord);
     }
-  }, [item, socket])
+  }, [item, socket, handleGuesstingWord])
 
 
   useEffect(() => {
     const handleNewPlayer = async (player) => {
       let response = await axios.get(`${backendLink}/userList`);
-      setplayer(response.data)
+      let playerdata = response.data.filter((e) => {
+        return e.room == room
+      })
+      setplayer(playerdata);
     }
 
     const dummy = async () => {
@@ -211,7 +218,7 @@ export default function Info(props) {
             <span className="select">
 
               <div onClick={async () => {
-                await socket.emit("wordToGuess", [wordArray[random]["1"]]);
+                await socket.emit("wordToGuess", { word: wordArray[random]["1"], room });
                 setItem(wordArray[random]["1"]);
                 questions.current.style.display = "none";
               }}>
@@ -219,7 +226,7 @@ export default function Info(props) {
               </div>
 
               <div onClick={async () => {
-                await socket.emit("wordToGuess", [wordArray[random]["2"]]);
+                await socket.emit("wordToGuess", { word: wordArray[random]["2"], room });
                 setItem(wordArray[random]["2"]);
                 questions.current.style.display = "none";
               }}>
@@ -227,7 +234,7 @@ export default function Info(props) {
               </div>
 
               <div onClick={async () => {
-                await socket.emit("wordToGuess", [wordArray[random]["3"]]);
+                await socket.emit("wordToGuess", { word: wordArray[random]["3"], room });
                 setItem(wordArray[random]["3"]);
                 questions.current.style.display = "none";
               }}>

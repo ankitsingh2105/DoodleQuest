@@ -7,19 +7,20 @@ const { User } = require("./database/schema");
 const { Server } = require("socket.io");
 
 const server = http.createServer(app);
-// origin: "http://localhost:5173",
+// origin: "https://doodlequest.vercel.app",
 
 const corsOptions = {
-    origin: "https://doodlequest.vercel.app",
+    origin: "http://localhost:5173",
     methods: ["GET", "POST"],
     credentials: true, // Allow credentials if needed
 };
 
 app.use(cors(corsOptions));
 
+// origin: "https://doodlequest.vercel.app",
 const io = new Server(server, {
     cors: {
-        origin: "https://doodlequest.vercel.app",
+        origin: "http://localhost:5173",
         methods: ["GET", "POST"],
         credentials: true,
     }
@@ -81,23 +82,23 @@ io.on("connection", (client) => {
         console.log("room is ::", info.room);
         const room = info.room;
         console.log(typeof (room));
-        io.emit("receiveMessage", info);
+        io.to(room).emit("receiveMessage", info);
     })
 
     // todo :: choosing the players
-    client.on('myEvent', (currentIteration) => {
+    client.on('myEvent', ({currentIteration, room}) => {
         console.log(`Received from ${client.id}:`, currentIteration);
-        io.emit('acknowledgement', currentIteration);
+        io.to(room).emit('acknowledgement', currentIteration);
     });
 
     // todo :: word to find
-    client.on("wordToGuess", (info) => {
-        console.log("info is :: ", info)
-        io.emit("wordToGuess", info);
+    client.on("wordToGuess", ({word, room}) => {
+        console.log("word is :: ", word)
+        io.to(room).emit("wordToGuess", word);
     })
 
     // todo :: updating points
-    client.on("updatePlayerPoints", async ({ name, drawTime }) => {
+    client.on("updatePlayerPoints", async ({ name, drawTime, room }) => {
         console.log("in the server side for updating with :: ", name, drawTime);
         try {
             const updatedUser = await User.findOneAndUpdate(
@@ -114,7 +115,7 @@ io.on("connection", (client) => {
         } catch (error) {
             console.error("Error updating user:", error.message);
         }
-        io.emit("updatePlayerPoints", "info");
+        io.to(room).emit("updatePlayerPoints", "info");
     })
 
     // todo :: client reloaded, moved back, closed the page

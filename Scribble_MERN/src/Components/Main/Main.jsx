@@ -65,8 +65,12 @@ export default function Main() {
 
     useEffect(() => {
         const handleNewPlayer = async (player) => {
+            const room = searchParams.get('roomID');
             let response = await axios.get(`${backendLink}/userList`);
-            setplayers(response.data)
+            let playerdata = response.data.filter((e) => {
+                return e.room == room
+            })
+            setplayers(playerdata)
         }
         socket.current.on("newPlayer", handleNewPlayer)
     }, [socket.current])

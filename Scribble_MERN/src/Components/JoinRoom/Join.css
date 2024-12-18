@@ -2,6 +2,7 @@
     height: 88vh;
     background-color:rgb(219, 255, 156);
     padding-top: 30px ;
+    height: 97vh;
 }
 .join_main input::placeholder{
     font-size: 20px;
@@ -9,6 +10,9 @@
 .join_main input{
     font-size: 20px;
     padding: 5px;
+    border-radius: 10px;
+    border: none;
+    padding: 10px;
 }
 .join_main button{
     font-size: 20px;
@@ -17,4 +21,13 @@
     color: black;
     font-style: none;
     background-color: red;
+}
+button{
+    border-radius: 10px;
+    border: none;
+    padding: 10px;
+    font-weight: bolder;
+}
+.join_main h1{
+    font-family: 'Courier New', Courier, monospace;
 }

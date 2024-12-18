@@ -24,9 +24,9 @@ export default function Players(props) {
                 <>
                   {
                     index % 2 == 0 ?
-                      <center style={{ background: "white" }} className='player' > <b>{e.userName}</b> {emojis[index]} <br />{e.points} <br/> #{index+1} </center>
+                      <center style={{ background: "white" }} className='player' > <b>{e.userName}</b> {emojis[index]} <br />{e.points} <br/> Position : {index+1} </center>
                       :
-                      <center style={{ background: "lightgreen" }} className='player' > <b>{e.userName}</b> {emojis[index]} <br />{e.points} <br/> #{index+1} </center>
+                      <center style={{ background: "lightgreen" }} className='player' > <b>{e.userName}</b> {emojis[index]} <br />{e.points} <br/> Position : {index+1} </center>
                   }
                 </>
               )

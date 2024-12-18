@@ -18,9 +18,9 @@ export default function Join() {
         <>
             <center className='join_main' >
                 <h1 style={{ fontSize: "70px" }}>DoodleQuest</h1>
-                <h2 style={{ marginTop: "-60px" }} >"🤭", "🥴", "🥴", "🤩"</h2>
+                <h2 style={{ marginTop: "-60px" }} >"🤭"  "🥴"  "🥴"  "🤩"</h2>
                 <br />
-                <h1 style={{ fontSize: "40px" }}>Join chat</h1>
+                <h1 style={{ fontSize: "40px" }}>Join Your Group</h1>
                 <input onChange={(event) => setuserName(event.target.value)} placeholder='Enter Name' type="text" />
                 <br />
                 <br />
@@ -29,8 +29,9 @@ export default function Join() {
                 <br />
                 <button onClick={handleJoinRoom} >
                     <Link style={{
+                        textDecoration: "none",
                         color: "black",
-                        fontStyle: "none",
+                        fontFamily : "Courier New', Courier, monospace"
                     }} to={`/room?roomID=${room}&name=${userName}`} >Join Room</Link>
                 </button>
             </center>

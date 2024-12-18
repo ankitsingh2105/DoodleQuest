@@ -6,7 +6,10 @@
 .align section{
     margin: 0px 10px;
 }
-
+.align button{
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bolder;
+}
 .Main_main{
     display: flex;
     align-items: center;
@@ -14,6 +17,10 @@
     flex-direction: column;
 }
 .Main_main{
-    background-color: rgb(255, 132, 132);
+    height: 97vh;
     background-color: rgb(219, 255, 156);
+    border-radius: 6px;
+}
+canvas{
+    background-color: rgb(231, 254, 244);
 }

@@ -39,7 +39,6 @@ export default function Info(props) {
     const fetchUsers = async () => {
       try {
         let response = await axios.get(`${backendLink}/userList`);
-        console.log("this si the room :: ", room);
         let playerdata = response.data.filter((e) => {
           return e.room == room
         })
@@ -119,9 +118,8 @@ export default function Info(props) {
   const StartGame = async () => {
     let loopCount = players.length;
     let currentIteration = 0;
-    console.log(socket);
-    console.log(socket);
-    console.log(socket.on);
+    console.log("socket : ", socket);
+    console.log("socker.on : ", socket.on);
     await socket.emit('myEvent', { currentIteration, room });
 
     const interval = setInterval(async () => {
@@ -134,8 +132,6 @@ export default function Info(props) {
       }
     }, 25000);
   };
-
-
 
   const handleEnter = async (e) => {
     setUserWithGuess(name);
@@ -155,6 +151,8 @@ export default function Info(props) {
     console.log("this is the word :: ", word);
     setItem(word);
   }
+
+
   useEffect(() => {
     socket.on("wordToGuess", handleGuesstingWord);
     return () => {
@@ -199,7 +197,7 @@ export default function Info(props) {
 
           <section>
 
-            <input onChange={(e) => setAnswer(e.target.value)} type="text" onKeyDown={handleEnter} placeholder='Enter your answer here' />
+            <input onChange={(e) => setAnswer(e.target.value)} type="text" onKeyDown={handleEnter} placeholder='Enter your answer here..' />
 
           </section>
 

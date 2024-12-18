@@ -43,6 +43,7 @@ export default function Main() {
             context.stroke();
         });
 
+
         socket.current.on("clear", ({ width, height }) => {
             const canvas = canvasRef.current;
             const context = contextRef.current;
@@ -80,8 +81,9 @@ export default function Main() {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
         context.lineCap = 'round';
+        context.lineJoin = 'round';
         context.strokeStyle = color;
-        context.lineWidth = 5;
+        context.lineWidth = 5; 
         contextRef.current = context;
         return () => {
             if (socket.current) {
@@ -95,8 +97,18 @@ export default function Main() {
         const { offsetX, offsetY } = nativeEvent;
         contextRef.current.beginPath();
         contextRef.current.moveTo(offsetX, offsetY);
+        socket.current.emit("beginPath", { room, offsetX, offsetY });
         setIsDrawing(true);
     };
+
+    useEffect(() => {
+        socket.current.on("beginPath", ({ offsetX, offsetY }) => {
+            const context = contextRef.current;
+            context.beginPath();
+            context.moveTo(offsetX, offsetY);
+        });
+    }, []);
+
 
     const finishDrawing = () => {
         setIsDrawing(false);
@@ -108,11 +120,16 @@ export default function Main() {
         if (!isDrawing) return;
 
         const { offsetX, offsetY } = nativeEvent;
-        contextRef.current.lineTo(offsetX, offsetY);
-        contextRef.current.stroke();
 
+        // Local rendering
+        const context = contextRef.current;
+        context.lineTo(offsetX, offsetY);
+        context.stroke();
+
+        // Emit event for others
         throttledEmitDraw(offsetX, offsetY, color);
     };
+
 
     const throttledEmitDraw = throttle((offsetX, offsetY, color) => {
         socket.current.emit("draw", { room, offsetX, offsetY, color });
@@ -134,10 +151,11 @@ export default function Main() {
             if (!inThrottle) {
                 func.apply(context, args);
                 inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
+                setTimeout(() => (inThrottle = false), limit); // Adjust to 20-30 ms
             }
-        }
+        };
     }
+
 
     return (
         <>
@@ -163,12 +181,6 @@ export default function Main() {
                                 style={{ border: "2px solid black" }}
                             />
                             <div style={{ marginTop: '10px' }}>
-                                <input
-                                    type="color"
-                                    value={color}
-                                    onChange={(e) => setColor(e.target.value)}
-                                />
-                                &nbsp;
                                 <button onClick={clearCanvas}>Clear</button>
                             </div>
                         </center>

@@ -7,8 +7,8 @@ export default function Chat(props) {
   const [allMessages, setAllMessages] = useState([]);
 
   const sendMessage = async () => {
-    console.log("messgae ::: " , message)
-    if (message === "") return; 
+    console.log("messgae ::: ", message)
+    if (message === "") return;
     const messageData = {
       name,
       message,
@@ -26,24 +26,23 @@ export default function Chat(props) {
 
     socket.on("receiveMessage", handleMessages);
 
-    // Cleanup listener on component unmount
     return () => {
       socket.off("receiveMessage", handleMessages);
-    }; 
+    };
   }, [socket]);
 
   return (
     <main className='chat_main'>
       <h1>Chats</h1>
       <section className="messages">
-        {allMessages.slice().reverse().map((e, index) =>{
-          return(
+        {allMessages.slice().reverse().map((e, index) => {
+          return (
             <>
               {
-                index%2==0 ?
-                <div className="newMessages" style={{background:"white"}} key={index}><small><b>{e.name} :: {e.message}</b></small></div>
-                :
-                <div className="newMessages" style={{background:"lightgreen"}} key={index}><small><b>{e.name} :: {e.message}</b></small></div>
+                index % 2 == 0 ?
+                  <div className="newMessages" style={{ background: "white" }} key={index}><small><b>{e.name} :: {e.message}</b></small></div>
+                  :
+                  <div className="newMessages" style={{ background: "lightgreen" }} key={index}><small><b>{e.name} :: {e.message}</b></small></div>
               }
             </>
           )

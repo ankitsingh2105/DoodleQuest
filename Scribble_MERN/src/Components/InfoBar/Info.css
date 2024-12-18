@@ -6,6 +6,7 @@
     display: flex;
     align-items: center;
     justify-content:space-between;
+    margin: auto;
 }
 .info_Main section{
     margin: 0px 10px;
@@ -13,6 +14,8 @@
 
 .info_Main section input{
     padding: 5px;
+    width: 16rem;
+    font-family: 'Courier New', Courier, monospace;
 }
 
 
@@ -80,8 +83,10 @@
 
 .main_Info button{
     font-size: 18px;
-    background-color: rgb(255, 1, 35);
-    color: white;
+    background-color: rgb(111, 255, 0);
+    border-radius: 0px;
+    margin: auto;
+    font-family: 'Courier New', Courier, monospace;
 }
 .time, .choosingTime{
     font-size: 18px;

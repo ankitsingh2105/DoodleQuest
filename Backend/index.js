@@ -86,13 +86,18 @@ io.on("connection", (client) => {
     })
 
     // todo :: choosing the players
-    client.on('myEvent', ({currentIteration, room}) => {
+    client.on('myEvent', ({ currentIteration, room }) => {
         console.log(`Received from ${client.id}:`, currentIteration);
         io.to(room).emit('acknowledgement', currentIteration);
     });
 
+    client.on("beginPath", ({ room, offsetX, offsetY }) => {
+        client.to(room).emit("beginPath", { offsetX, offsetY });
+    });
+
+
     // todo :: word to find
-    client.on("wordToGuess", ({word, room}) => {
+    client.on("wordToGuess", ({ word, room }) => {
         console.log("word is :: ", word)
         io.to(room).emit("wordToGuess", word);
     })

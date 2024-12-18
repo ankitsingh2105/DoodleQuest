@@ -7,20 +7,20 @@ const { User } = require("./database/schema");
 const { Server } = require("socket.io");
 
 const server = http.createServer(app);
-// origin: "https://doodlequest.vercel.app",
 
+// origin: "http://localhost:5173",
 const corsOptions = {
-    origin: "http://localhost:5173",
+    origin: "https://doodlequest.vercel.app",
     methods: ["GET", "POST"],
     credentials: true, // Allow credentials if needed
 };
 
 app.use(cors(corsOptions));
 
-// origin: "https://doodlequest.vercel.app",
+// origin: "http://localhost:5173",
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173",
+        origin: "https://doodlequest.vercel.app",
         methods: ["GET", "POST"],
         credentials: true,
     }

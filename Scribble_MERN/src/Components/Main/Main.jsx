@@ -142,7 +142,7 @@ export default function Main() {
 
     const throttledEmitDraw = throttle(function ([offsetX, offsetY, color]) {
         socket.current.emit("draw", { room, offsetX, offsetY, color });
-    }, 30); // * req after 20ms only
+    }, 0); // * req after 20ms only
 
 
     function throttle(func, limit) {

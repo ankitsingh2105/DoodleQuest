@@ -8,11 +8,10 @@ const { Server } = require("socket.io");
 
 const server = http.createServer(app);
 
-// origin: "http://localhost:5173",
+// origin: "https://doodlequest.vercel.app",
 const corsOptions = {
-    origin: "https://doodlequest.vercel.app",
-    methods: ["GET", "POST"],
-    credentials: true, // Allow credentials if needed
+    origin: ["http://localhost:5173", "https://doodlequest.vercel.app" ],
+    credentials: true, 
 };
 
 app.use(cors(corsOptions));
@@ -20,8 +19,7 @@ app.use(cors(corsOptions));
 // origin: "http://localhost:5173",
 const io = new Server(server, {
     cors: {
-        origin: "https://doodlequest.vercel.app",
-        methods: ["GET", "POST"],
+        origin: ["https://doodlequest.vercel.app", "http://localhost:5173"],
         credentials: true,
     }
 });

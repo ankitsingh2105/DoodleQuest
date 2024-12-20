@@ -26,6 +26,8 @@ export default function Main() {
         window.location.href = "/"
     };
 
+
+
     window.addEventListener("load", handleOnoad);
 
 
@@ -38,7 +40,6 @@ export default function Main() {
 
         socket.current.on("draw", ({ offsetX, offsetY, color }) => {
             const context = contextRef.current;
-            context.strokeStyle = color;
             context.lineTo(offsetX, offsetY);
             context.stroke();
         });
@@ -48,7 +49,6 @@ export default function Main() {
             const canvas = canvasRef.current;
             const context = contextRef.current;
             context.clearRect(0, 0, canvas.width, canvas.height);
-            context.clearRect(0, 0, width, height);
             context.beginPath();
         });
 
@@ -83,7 +83,7 @@ export default function Main() {
         context.lineCap = 'round';
         context.lineJoin = 'round';
         context.strokeStyle = color;
-        context.lineWidth = 5; 
+        context.lineWidth = 5;
         contextRef.current = context;
         return () => {
             if (socket.current) {
@@ -116,24 +116,49 @@ export default function Main() {
         socket.current.emit("stopDrawing", { room });
     };
 
+    // todo : for picking color
+    const handleColorChange = (event) => {
+        setColor(event.target.value);
+    };
+
+
+    // * called on onMouseMove event
     const draw = ({ nativeEvent }) => {
         if (!isDrawing) return;
 
         const { offsetX, offsetY } = nativeEvent;
 
-        // Local rendering
         const context = contextRef.current;
         context.lineTo(offsetX, offsetY);
         context.stroke();
 
-        // Emit event for others
         throttledEmitDraw(offsetX, offsetY, color);
     };
 
+    //todo :: Each mouse movement sends a request via WebSocket. To limit how often requests are sent, I used the throttle function.
 
-    const throttledEmitDraw = throttle((offsetX, offsetY, color) => {
+    // used throttling, and closure
+
+
+    const throttledEmitDraw = throttle(function ([offsetX, offsetY, color]) {
         socket.current.emit("draw", { room, offsetX, offsetY, color });
-    }, 50);
+    }, 30); // * req after 20ms only
+
+
+    function throttle(func, limit) {
+        let inThrottle = false;
+        return function (...args) {
+            if (!inThrottle) {
+                func(args);
+                inThrottle = true;
+                setTimeout(() => {
+                    inThrottle = false;
+                }, limit);
+                // todo :: here i am forcing the requests to be sent only every 20 milliseconds, instead of on every single mouse movement event.
+            }
+        };
+    }
+
 
     const clearCanvas = () => {
         const canvas = canvasRef.current;
@@ -143,18 +168,6 @@ export default function Main() {
         socket.current.emit("clear", { room, "width": canvas.width, "height": canvas.height });
     };
 
-    function throttle(func, limit) {
-        let inThrottle;
-        return function () {
-            const args = arguments;
-            const context = this;
-            if (!inThrottle) {
-                func.apply(context, args);
-                inThrottle = true;
-                setTimeout(() => (inThrottle = false), limit); // Adjust to 20-30 ms
-            }
-        };
-    }
 
 
     return (
@@ -180,6 +193,14 @@ export default function Main() {
                                 onMouseLeave={finishDrawing}
                                 style={{ border: "2px solid black" }}
                             />
+                            {/* <div style={{ marginBottom: '10px' }}>
+                                <input
+                                    id="colorPicker"
+                                    type="color"
+                                    value={color}
+                                    onChange={handleColorChange}
+                                />
+                            </div> */}
                             <div style={{ marginTop: '10px' }}>
                                 <button onClick={clearCanvas}>Clear</button>
                             </div>

@@ -7,7 +7,7 @@ const { User } = require("./database/schema");
 const { Server } = require("socket.io");
 
 const server = http.createServer(app);
-
+ 
 // origin: "https://doodlequest.vercel.app",
 const corsOptions = {
     origin: ["http://localhost:5173", "https://doodlequest.vercel.app" ],
@@ -57,16 +57,17 @@ io.on("connection", (client) => {
         catch (error) {
             console.log("Something went wrong");
         }
-        io.to(room).emit("newPlayer");
+        
+        io.to(room).emit("newPlayer" , client.id);
     });
 
     client.on("draw", ({ room, offsetX, offsetY, color }) => {
-        io.to(room).emit("draw", { offsetX, offsetY, color });
+        io.to(room).emit("draw", { offsetX, offsetY, color , playerID: client.id });
     });
 
 
     client.on("stopDrawing", (room) => {
-        io.to(room).emit("stopDrawing", room);
+        io.to(room).emit("stopDrawing", {room, playerID: client.id });
     });
 
     client.on("clear", ({ room, width, height }) => {
@@ -79,7 +80,6 @@ io.on("connection", (client) => {
         console.log("sending message", info);
         console.log("room is ::", info.room);
         const room = info.room;
-        console.log(typeof (room));
         io.to(room).emit("receiveMessage", info);
     })
 
@@ -90,7 +90,7 @@ io.on("connection", (client) => {
     });
 
     client.on("beginPath", ({ room, offsetX, offsetY }) => {
-        client.to(room).emit("beginPath", { offsetX, offsetY });
+        client.to(room).emit("beginPath", { offsetX, offsetY , playerID : client.id });
     });
 
 

@@ -197,7 +197,7 @@ export default function Info(props) {
 
           <section>
 
-            <input onChange={(e) => setAnswer(e.target.value)} type="text" onKeyDown={handleEnter} placeholder='Enter your answer here..' />
+            <input onChange={(e) => setAnswer(e.target.value)} type="text" onKeyDown={handleEnter} placeholder='Enter your guess' />
 
           </section>
 
@@ -238,7 +238,6 @@ export default function Info(props) {
               }}>
                 {wordArray[random]["3"]}
               </div>
-
 
             </span>
 

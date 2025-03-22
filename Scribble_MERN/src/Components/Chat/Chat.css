@@ -1,6 +1,6 @@
 .chat_main {
     margin: 0px;
-    background-color: rgb(197, 255, 254);
+    background-color: rgb(222, 249, 204);
     width: 210px;
     display: flex;
     flex-direction: column;
@@ -30,7 +30,7 @@
 
 .sendChat input {
     flex: 1;
-    padding: 3px;
+    padding: 5px;
     width: 144px;
     border-radius: 4px;
     border: none;
@@ -52,6 +52,6 @@
 
 .messages::-webkit-scrollbar {
     width: 10px; 
-    background-color: rgb(245, 255, 155);
+    background-color: rgb(155, 255, 187);
     border-radius: 1px;
 }

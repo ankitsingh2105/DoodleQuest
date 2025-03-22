@@ -20,6 +20,7 @@ export default function Join() {
                 <h1 style={{ fontSize: "70px" }}>DoodleQuest</h1>
                 <h2 style={{ marginTop: "-60px" }} >"🤭"  "🥴"  "🥴"  "🤩"</h2>
                 <br />
+                <h2>Draw and guess multiplayer online game</h2>
                 <h1 style={{ fontSize: "40px" }}>Join Your Group</h1>
                 <input onChange={(event) => setuserName(event.target.value)} placeholder='Enter Name' type="text" />
                 <br />

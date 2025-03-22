@@ -20,14 +20,13 @@ export default function Main() {
     const [color, setColor] = useState('#000000');
     const [players, setplayers] = useState([])
 
+    const [clientId, setClientID] = useState(localStorage.getItem("playerID") ||undefined);
+
 
     const handleOnoad = async (event) => {
         await socket.current.emit("disconnectUser", { name, room });
         window.location.href = "/"
     };
-
-
-
     window.addEventListener("load", handleOnoad);
 
 
@@ -38,7 +37,9 @@ export default function Main() {
 
         socket.current.emit("join-room", { room, name });
 
-        socket.current.on("draw", ({ offsetX, offsetY, color }) => {
+        socket.current.on("draw", ({ offsetX, offsetY, color, playerID}) => {
+            console.log("on the top ::  vaha se -> ", playerID , " and ", clientId)
+            if(playerID == clientId) return;
             const context = contextRef.current;
             context.lineTo(offsetX, offsetY);
             context.stroke();
@@ -61,12 +62,15 @@ export default function Main() {
         return () => {
             socket.current.disconnect();
         };
-    }, [room]);
+    }, [socket]);
 
 
     useEffect(() => {
-        const handleNewPlayer = async (player) => {
+        const handleNewPlayer = async (playerID) => {
+            if(playerID == clientId) return;
             const room = searchParams.get('roomID');
+            setClientID(playerID);
+            localStorage.setItem("playerID" , playerID);
             let response = await axios.get(`${backendLink}/userList`);
             let playerdata = response.data.filter((e) => {
                 return e.room == room
@@ -74,7 +78,11 @@ export default function Main() {
             setplayers(playerdata)
         }
         socket.current.on("newPlayer", handleNewPlayer)
-    }, [socket.current])
+    },[])
+
+    useEffect(()=>{
+        console.log("mere naam  :: " , clientId);
+    },[clientId])
 
 
     useEffect(() => {
@@ -91,10 +99,9 @@ export default function Main() {
                 socket.current = null;
             }
         };
-    }, [color]);
+    }, [socket]);
 
-    const startDrawing = ({ nativeEvent }) => {
-        const { offsetX, offsetY } = nativeEvent;
+    const startDrawing = ({ offsetX, offsetY }) => {
         contextRef.current.beginPath();
         contextRef.current.moveTo(offsetX, offsetY);
         socket.current.emit("beginPath", { room, offsetX, offsetY });
@@ -102,7 +109,8 @@ export default function Main() {
     };
 
     useEffect(() => {
-        socket.current.on("beginPath", ({ offsetX, offsetY }) => {
+        socket.current.on("beginPath", ({ offsetX, offsetY ,playerID }) => {
+            if(playerID == clientId) return;
             const context = contextRef.current;
             context.beginPath();
             context.moveTo(offsetX, offsetY);
@@ -142,7 +150,7 @@ export default function Main() {
 
     const throttledEmitDraw = throttle(function ([offsetX, offsetY, color]) {
         socket.current.emit("draw", { room, offsetX, offsetY, color });
-    }, 100); // * req after 20ms only
+    }, 20); // * req after 20ms only
 
 
     function throttle(func, limit) {
@@ -191,7 +199,7 @@ export default function Main() {
                                 onMouseUp={finishDrawing}
                                 onMouseMove={draw}
                                 onMouseLeave={finishDrawing}
-                                style={{ border: "2px solid black" }}
+                                style={{ border: "1px solid black", background:"white" }}
                             />
                             {/* <div style={{ marginBottom: '10px' }}>
                                 <input

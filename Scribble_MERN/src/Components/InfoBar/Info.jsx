@@ -9,7 +9,6 @@ import backendLink from '../../../backendlink';
 
 export default function Info(props) {
   const { socket, player, name, setplayer, room } = props;
-  // const socket = useRef(socket);
 
   const [answer, setAnswer] = useState("");
   const [item, setItem] = useState("");

@@ -12,7 +12,7 @@ const server = http.createServer(app);
 const corsOptions = {
     origin: ["http://localhost:5173", "https://doodlequest.vercel.app", "https://doodlequest.games" ],
     credentials: true, 
-};
+};-
 
 app.use(cors(corsOptions));
 
@@ -65,7 +65,6 @@ io.on("connection", (client) => {
         io.to(room).emit("draw", { offsetX, offsetY, color , playerID: client.id });
     });
 
-
     client.on("stopDrawing", (room) => {
         io.to(room).emit("stopDrawing", {room, playerID: client.id });
     });
@@ -73,7 +72,6 @@ io.on("connection", (client) => {
     client.on("clear", ({ room, width, height }) => {
         io.to(room).emit("clear", { width, height });
     });
-
 
     // todo :: chatting 
     client.on("sendMessage", (info) => {
@@ -134,6 +132,8 @@ io.on("connection", (client) => {
     })
 
 });
+
+
 app.get('/userList', async (req, res) => {
     try {
         const users = await User.find();

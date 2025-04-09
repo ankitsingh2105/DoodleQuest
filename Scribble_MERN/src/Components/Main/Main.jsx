@@ -20,11 +20,10 @@ export default function Main() {
     const [color, setColor] = useState('#000000');
     const [players, setplayers] = useState([])
 
-    const [clientId, setClientID] = useState(localStorage.getItem("playerID") ||undefined);
 
 
-    const handleOnoad = async (event) => {
-        await socket.current.emit("disconnectUser", { name, room });
+    const handleOnoad = (event) => {
+        socket.current.emit("disconnectUser", { name, room });
         window.location.href = "/"
     };
     window.addEventListener("load", handleOnoad);
@@ -37,10 +36,9 @@ export default function Main() {
 
         socket.current.emit("join-room", { room, name });
 
-        socket.current.on("draw", ({ offsetX, offsetY, color, playerID}) => {
-            console.log("on the top ::  vaha se -> ", playerID , " and ", clientId)
-            if(playerID == clientId) return;
+        socket.current.on("draw", ({ offsetX, offsetY, color }) => {
             const context = contextRef.current;
+            context.strokeStyle = color;
             context.lineTo(offsetX, offsetY);
             context.stroke();
         });
@@ -58,6 +56,11 @@ export default function Main() {
             context.closePath();
         });
 
+        socket.current.on("beginPath", () => {
+            const context = contextRef.current;
+            context.beginPath();
+        });
+
         // todo :: Cleanup function: disconnect socket when component unmounts or when room changes
         return () => {
             socket.current.disconnect();
@@ -67,10 +70,8 @@ export default function Main() {
 
     useEffect(() => {
         const handleNewPlayer = async (playerID) => {
-            if(playerID == clientId) return;
             const room = searchParams.get('roomID');
-            setClientID(playerID);
-            localStorage.setItem("playerID" , playerID);
+            localStorage.setItem("playerID", playerID);
             let response = await axios.get(`${backendLink}/userList`);
             let playerdata = response.data.filter((e) => {
                 return e.room == room
@@ -78,11 +79,7 @@ export default function Main() {
             setplayers(playerdata)
         }
         socket.current.on("newPlayer", handleNewPlayer)
-    },[])
-
-    useEffect(()=>{
-        console.log("mere naam  :: " , clientId);
-    },[clientId])
+    }, [])
 
 
     useEffect(() => {
@@ -108,20 +105,11 @@ export default function Main() {
         setIsDrawing(true);
     };
 
-    useEffect(() => {
-        socket.current.on("beginPath", ({ offsetX, offsetY ,playerID }) => {
-            if(playerID == clientId) return;
-            const context = contextRef.current;
-            context.beginPath();
-            context.moveTo(offsetX, offsetY);
-        });
-    }, []);
-
-
     const finishDrawing = () => {
         setIsDrawing(false);
         contextRef.current.closePath();
         socket.current.emit("stopDrawing", { room });
+        contextRef.closePath();
     };
 
     // todo : for picking color
@@ -199,16 +187,16 @@ export default function Main() {
                                 onMouseUp={finishDrawing}
                                 onMouseMove={draw}
                                 onMouseLeave={finishDrawing}
-                                style={{ border: "1px solid black", background:"white" }}
+                                style={{ border: "1px solid black", background: "white" }}
                             />
-                            {/* <div style={{ marginBottom: '10px' }}>
+                            <div style={{ marginBottom: '10px' }}>
                                 <input
                                     id="colorPicker"
                                     type="color"
                                     value={color}
                                     onChange={handleColorChange}
                                 />
-                            </div> */}
+                            </div>
                             <div style={{ marginTop: '10px' }}>
                                 <button onClick={clearCanvas}>Clear</button>
                             </div>

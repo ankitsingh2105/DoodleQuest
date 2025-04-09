@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Learning Canvas </title>
+</head>
+<body>
+  <!-- Canvas where the user will draw -->
+  <canvas id="drawCanvas" width="600" height="400" style="border:1px solid #000;"></canvas>
+
+  <script>
+    // Get the canvas element and 2D drawing context
+    const canvas = document.getElementById('drawCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Flag to track whether the mouse is currently drawing
+    let isDrawing = false;
+
+    // When the mouse is pressed down, start drawing
+    canvas.addEventListener('mousedown', (e) => {
+      isDrawing = true; // Enable drawing
+      ctx.beginPath(); // Start a new path
+      ctx.moveTo(e.offsetX, e.offsetY); // Move to where the mouse is
+      console.log(`🟢 Mouse down -> Start drawing at (${e.offsetX}, ${e.offsetY})`);
+    });
+
+    // When the mouse moves, draw if drawing is active
+    canvas.addEventListener('mousemove', (e) => {
+      if (!isDrawing) return; // If not drawing, skip
+      ctx.lineTo(e.offsetX, e.offsetY); // Draw line to new mouse position
+      ctx.strokeStyle = 'black'; // Line color
+      ctx.lineWidth = 2; // Line thickness
+      ctx.stroke(); // Draw the line
+      console.log(`✏️ Mouse move -> Drawing at (${e.offsetX}, ${e.offsetY})`);
+    });
+
+    // When the mouse is released, stop drawing
+    canvas.addEventListener('mouseup', () => {
+      if (isDrawing) {
+        console.log('🛑 Mouse up —> stop drawing');
+        isDrawing = false; // Disable drawing
+        ctx.closePath(); // End the current path
+      }
+    });
+
+    // If mouse leaves canvas while drawing, stop drawing
+    canvas.addEventListener('mouseleave', () => {
+      if (isDrawing) {
+        console.log('🚪 Mouse leave -> canvas — stop drawing');
+        isDrawing = false; // Disable drawing
+        ctx.closePath(); // End the path
+      }
+    });
+  </script>
+</body>
+</html>

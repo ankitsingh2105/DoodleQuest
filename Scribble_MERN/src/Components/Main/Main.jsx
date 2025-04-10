@@ -78,6 +78,7 @@ export default function Main() {
             })
             setplayers(playerdata)
         }
+        toast.success("This game is hosted on free tire of a backend service, it might take some time to start");
         socket.current.on("newPlayer", handleNewPlayer)
     }, [])
 

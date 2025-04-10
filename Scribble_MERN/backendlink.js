@@ -1,4 +1,4 @@
 
-const backendLink = "http://localhost:3000";
-// const backendLink = "https://doodlequest.up.railway.app";
+// const backendLink = "http://localhost:3000";
+const backendLink = "https://doodlequestbackend.vercel.app";
 export default backendLink; 

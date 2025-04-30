@@ -1,42 +1,10 @@
-.join_main {
-    background-color: rgb(219, 255, 156);
-    padding-top: 30px;
-    height: 92vh;
-}
-
-.join_main input::placeholder {
-    font-size: 20px;
-}
-
-.join_main input {
-    font-size: 20px;
-    padding: 5px;
-    border-radius: 10px;
-    border: none;
-    padding: 10px;
-}
-
-.join_main button {
-    font-size: 20px;
-}
-
-.join_main Link {
-    color: black;
-    font-style: none;
-    background-color: red;
-}
-
-button {
-    border-radius: 10px;
-    border: none;
-    padding: 10px;
-    font-weight: bolder;
-}
-
-.join_main h1 {
-    font-family: 'Courier New', Courier, monospace;
-}
-
-h2:nth-child(4) {
-    color: white;
-}
+@keyframes wiggle {
+    0%, 100% { transform: rotate(-50deg); }
+    50% { transform: rotate(50deg); }
+  }
+  
+  .animate-wiggle {
+    animation: wiggle 3s infinite;
+  }
+  
+  

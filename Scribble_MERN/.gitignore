@@ -10,6 +10,8 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+learning
+canvas
 *.local
 
 # Editor directories and files

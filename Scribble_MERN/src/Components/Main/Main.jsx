@@ -36,6 +36,10 @@ export default function Main() {
     //     window.location.href = "/"
     // };
     // window.addEventListener("load", handleOnoad);
+
+      useEffect(()=>{
+        console.log("This service is running on a free tier, might take some time to load")
+      },[])
     
 
     useEffect(() => {

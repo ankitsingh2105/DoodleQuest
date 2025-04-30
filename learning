@@ -1,3 +1,0 @@
-what is the use of useREF, and why socket usig a useREF not straign forward
-we can use useRef for to prevent stale values in useEffect - playerID main.jsx
-rendering vs refreshing

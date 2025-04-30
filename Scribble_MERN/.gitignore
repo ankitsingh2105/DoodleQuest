@@ -12,7 +12,7 @@ dist
 dist-ssr
 learning
 canvas
-backendlink
+backendlink.js
 *.local
 
 # Editor directories and files

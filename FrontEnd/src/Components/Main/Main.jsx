@@ -187,7 +187,7 @@ export default function Main() {
         context.lineTo(offsetX, offsetY);
         context.stroke();
 
-        throttledEmitDraw(offsetX, offsetY, color);
+        throttledEmitDraw([offsetX, offsetY, color]);
     };
 
     //todo :: Each mouse movement sends a request via WebSocket. To limit how often requests are sent, I used the throttle function.
@@ -195,7 +195,7 @@ export default function Main() {
     // used throttling, and closure
     const throttledEmitDraw = throttle(function ([offsetX, offsetY, color]) {
         socket.current.emit("draw", { room, offsetX, offsetY, color });
-    }, 20); // * req after 20ms only
+    }, 30); // * req after 20ms only
 
 
     function throttle(func, limit) {

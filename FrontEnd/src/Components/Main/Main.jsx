@@ -38,7 +38,7 @@ export default function Main() {
     // window.addEventListener("load", handleOnoad);
 
       useEffect(()=>{
-        console.log("This service is running on a free tier, might take some time to load")
+        toast.success("This service is running on a free tier, might take some time to load", {autoClose:1500});
       },[])
     
 
@@ -79,7 +79,10 @@ export default function Main() {
             context.closePath();
         };
 
-        const handleBeginPath = ({ playerID }) => {
+        const handleBeginPath = ({ socketID }) => {
+            if(socketID === playerID){
+                return;
+            }
             const context = contextRef.current;
             // console.log("player id on socket is ", playerID);
             context.beginPath();
@@ -237,9 +240,6 @@ export default function Main() {
                     <div ref={finalScorecard} className="hidden fixed top-1/3 left-0 right-0 border-7 border-dashed border-blue-300 rounded-4xl p-6 max-w-lg mx-auto bg-white shadow-lg">
                         <h1 className="underline text-2xl font-bold text-blue-500 mb-4">Final Scorecard</h1>
                         <ul className="space-y-2">
-                            {/* // * points to remember */}
-                            {/* b.points - a.points: sorts in descending order.
-                        [...] is used to avoid mutating the original players array. */}
                             {[...players]
                                 .sort((a, b) => b.points - a.points)
                                 .map((e, i) => (

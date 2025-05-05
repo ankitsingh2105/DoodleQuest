@@ -84,7 +84,7 @@ io.on("connection", (client) => {
 
     client.on("beginPath", ({ room, offsetX, offsetY }) => {
         console.log("beginnin the fucking path")
-        client.to(room).emit("beginPath", { offsetX, offsetY, playerID: client.id });
+        client.to(room).emit("beginPath", { offsetX, offsetY, socketID: client.id });
     });
 
 

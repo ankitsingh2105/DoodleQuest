@@ -13,6 +13,8 @@ export default function InfoBar(props) {
   const [playerDrawing, setPlayerDrawing] = useState("");
   const [inputDisable, setInputDisable] = useState(false); // for disabling input when user is drawing or have already answered correctly
 
+  const [disableStart, setStartDisable] = useState(false);
+
   const questions = useRef(null);
   const whoDrawingNow = useRef(null);
 
@@ -42,24 +44,25 @@ export default function InfoBar(props) {
   }, [drawTime]);
 
   async function chooseWordWait() {
-    return new Promise((resolve) => setTimeout(resolve, 25000));
+    return new Promise((resolve) => setTimeout(resolve, 7000));
   }
 
   useEffect(() => {
     const handleAcknowledgement = async (index) => {
+      setStartDisable(true);
       const currentPlayer = player[index];
       setrandom(Math.floor(Math.random() * 5));
 
       if (currentPlayer?.name === name) {
         setCountdown(5);
-        setDrawTime(25);
+        setDrawTime(7);
         whoDrawingNow.current.style.display = "none";
         questions.current.style.display = "flex";
         setInputDisable(true);
         await chooseWordWait();
       }
       else {
-        setDrawTime(25);
+        setDrawTime(7);
         setPlayerDrawing(currentPlayer?.name || '');
         whoDrawingNow.current.style.display = "flex";
         setInputDisable(false);
@@ -96,7 +99,7 @@ export default function InfoBar(props) {
         clearInterval(interval);
         socket.emit('gameOver', { room });
       }
-    }, 25000);
+    }, 7000);
   };
 
   const handleEnter = async (e) => {
@@ -124,7 +127,14 @@ export default function InfoBar(props) {
     socket.on('updatePlayerPoints', ({ players }) => {
       setplayer(players);
     });
-    return () => socket.off('updatePlayerPoints');
+    socket.on("gameOver", ()=>{
+      setStartDisable(false);
+    })
+    return () =>{ 
+      socket.off('updatePlayerPoints');
+      socket.off('gameOver');
+    }
+
   }, [socket]);
 
   return (
@@ -164,6 +174,7 @@ export default function InfoBar(props) {
           onClick={StartGame}
           className="px-4 py-2 text-white rounded-md font-bold"
           style={{ backgroundColor: 'oklch(65.6% 0.241 354.308)' }}
+          disabled={disableStart}
         >
           Start
         </button>

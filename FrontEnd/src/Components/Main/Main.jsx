@@ -46,7 +46,7 @@ export default function Main() {
         // Only create socket connection once
         if (!socket.current) {
             socket.current = io.connect(`${backendLink}`);
-        }
+        } 
 
         // todo :: want to prenet multiple joining of the same using, with different socket ids
         if (!hasJoined) {
@@ -61,7 +61,7 @@ export default function Main() {
         }
 
         const handleDraw = ({ offsetX, offsetY, color, socketID }) => {
-            if(socketID === playerID){
+            if(socketID === playerIDRef.current){
                 return;
             }
             const context = contextRef.current;
@@ -83,9 +83,9 @@ export default function Main() {
         };
 
         const handleBeginPath = ({ socketID }) => {
-            console.log("playerID : ", playerID);
-            console.log("socketID: ", socketID);
-            if (socketID === playerID) {
+            // console.log("playerID : ", playerID);
+            // console.log("socketID: ", socketID);
+            if (socketID === playerIDRef.current) {
                 return;
             }
             const context = contextRef.current;
@@ -103,7 +103,7 @@ export default function Main() {
             }
         }
         const waitForSomeTimeForScoreBoard = () => {
-            return new Promise((reject, resolve) => {
+            return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     socket.current.emit("hideScoreCard", { room });
                     resolve();
@@ -187,22 +187,22 @@ export default function Main() {
         context.lineTo(offsetX, offsetY);
         context.stroke();
 
-        throttledEmitDraw([offsetX, offsetY, color]);
+        throttledEmitDraw(offsetX, offsetY, color);
     };
 
     //todo :: Each mouse movement sends a request via WebSocket. To limit how often requests are sent, I used the throttle function.
 
     // used throttling, and closure
-    const throttledEmitDraw = throttle(function ([offsetX, offsetY, color]) {
+    const throttledEmitDraw = throttle(function (offsetX, offsetY, color) {
         socket.current.emit("draw", { room, offsetX, offsetY, color });
-    }, 30); // * req after 20ms only
+    }, 20); // * req after 20ms only
 
 
     function throttle(func, limit) {
         let inThrottle = false;
         return function (...args) {
             if (!inThrottle) {
-                func(args);
+                func(...args);
                 inThrottle = true;
                 setTimeout(() => {
                     inThrottle = false;
@@ -243,6 +243,7 @@ export default function Main() {
                 {/* Result */}
                 <center>
                     <div ref={finalScorecard} className="hidden fixed top-1/3 left-0 right-0 border-7 border-dashed border-blue-300 rounded-4xl p-6 max-w-lg mx-auto bg-white shadow-lg">
+                        <div onClick={()=>{finalScorecard.current.style.display = "none";}} className="hover:cursor-pointer absolute top-2 right-2 text-2xl font-bold">x</div>
                         <h1 className="underline text-2xl font-bold text-blue-500 mb-4">Final Scorecard</h1>
                         <ul className="space-y-2">
                             {[...players]
@@ -279,7 +280,7 @@ export default function Main() {
                     {/*todo : Drawing Canvas */}
                     <section className="flex-1 flex flex-col items-center bg-white rounded-2xl shadow-lg p-6">
                         <canvas
-                            width="600px"
+                            width="600px" 
                             height="450px"
                             ref={canvasRef}
                             onMouseDown={startDrawing}

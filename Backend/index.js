@@ -77,9 +77,9 @@ io.on("connection", (client) => {
     })
 
     // todo :: choosing the players
-    client.on('myEvent', ({ currentIteration, room }) => {
+    client.on('myEvent', ({ currentIteration, room, loopCount }) => {
         console.log(`Received from ${client.id}:`, currentIteration);
-        io.to(room).emit('acknowledgement', currentIteration);
+        io.to(room).emit('acknowledgement', {currentIteration, loopCount});
     });
 
     client.on("beginPath", ({ room, offsetX, offsetY }) => {

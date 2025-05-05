@@ -58,7 +58,7 @@ io.on("connection", (client) => {
     });
 
     client.on("draw", ({ room, offsetX, offsetY, color }) => {
-        io.to(room).emit("draw", { offsetX, offsetY, color, playerID: client.id });
+        io.to(room).emit("draw", { offsetX, offsetY, color, socketID: client.id });
     });
 
     client.on("stopDrawing", (room) => {

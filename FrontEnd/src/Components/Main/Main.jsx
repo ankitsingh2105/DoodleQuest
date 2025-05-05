@@ -37,10 +37,10 @@ export default function Main() {
     // };
     // window.addEventListener("load", handleOnoad);
 
-      useEffect(()=>{
-        toast.success("This service is running on a free tier, might take some time to load", {autoClose:1500});
-      },[])
-    
+    useEffect(() => {
+        toast.success("This service is running on a free tier, might take some time to load", { autoClose: 1500 });
+    }, [])
+
 
     useEffect(() => {
         // Only create socket connection once
@@ -51,7 +51,7 @@ export default function Main() {
         // todo :: want to prenet multiple joining of the same using, with different socket ids
         if (!hasJoined) {
             socket.current.emit("join-room", { room, name });
-            setHasJoined(true); 
+            setHasJoined(true);
         }
     }, [hasJoined, room, name]);
 
@@ -60,7 +60,10 @@ export default function Main() {
             socket.current = io.connect(`${backendLink}`);
         }
 
-        const handleDraw = ({ offsetX, offsetY, color }) => {
+        const handleDraw = ({ offsetX, offsetY, color, socketID }) => {
+            if(socketID === playerID){
+                return;
+            }
             const context = contextRef.current;
             context.strokeStyle = color;
             context.lineTo(offsetX, offsetY);
@@ -80,7 +83,9 @@ export default function Main() {
         };
 
         const handleBeginPath = ({ socketID }) => {
-            if(socketID === playerID){
+            console.log("playerID : ", playerID);
+            console.log("socketID: ", socketID);
+            if (socketID === playerID) {
                 return;
             }
             const context = contextRef.current;

@@ -8,7 +8,7 @@ import Chat from '../Chat/Chat';
 import Players from '../Players/Players';
 import InfoBar from '../InfoBar/InfoBar';
 import { toast } from 'react-toastify';
-import backendLink from "../../backendlink"
+import backendlink from "../../backendlink"
 import websocket from '../../../socket';
 
 export default function Main() {
@@ -45,7 +45,7 @@ export default function Main() {
     useEffect(() => {
         // Only create socket connection once
         if (!socket.current) {
-            socket.current = io.connect(`${backendLink}`);
+            socket.current = io.connect(`${backendlink}`);
         } 
 
         // todo :: want to prenet multiple joining of the same using, with different socket ids
@@ -57,7 +57,7 @@ export default function Main() {
 
     useEffect(() => {
         if (!socket.current) {
-            socket.current = io.connect(`${backendLink}`);
+            socket.current = io.connect(`${backendlink}`);
         }
 
         const handleDraw = ({ offsetX, offsetY, color, socketID }) => {

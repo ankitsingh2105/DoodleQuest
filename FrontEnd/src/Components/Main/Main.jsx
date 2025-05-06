@@ -76,7 +76,7 @@ export default function Main() {
             const context = contextRef.current;
             context.clearRect(0, 0, canvas.width, canvas.height);
             context.beginPath();
-        };
+        }; 
 
         const handleStopDrawing = () => {
             const context = contextRef.current;
@@ -84,8 +84,8 @@ export default function Main() {
         };
 
         const handleBeginPath = ({ socketID }) => {
-            // console.log("playerID : ", playerID);
-            // console.log("socketID: ", socketID);
+            console.log("playerID : ", playerID);
+            console.log("socketID: ", socketID);
             if (socketID === playerIDRef.current) {
                 return;
             }

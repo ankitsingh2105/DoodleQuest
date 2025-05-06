@@ -48,9 +48,9 @@ export default function InfoBar(props) {
   }
 
   useEffect(() => {
-    const handleAcknowledgement = async (index) => {
+    const handleAcknowledgement = async ({currentIteration, loopCount}) => {
       setStartDisable(true);
-      const currentPlayer = player[index];
+      const currentPlayer = player[currentIteration];
       setrandom(Math.floor(Math.random() * 5));
 
       if (currentPlayer?.name === name) {
@@ -81,6 +81,7 @@ export default function InfoBar(props) {
     setInputDisable(false);
     // questions.current.style.display = "flex";
     let loopCount = player.length;
+    console.log("number of players:: " , loopCount);
     if (loopCount == 1) {
       toast.error("Waiting for other players!", { autoClose: 1000 });
       return;
@@ -104,10 +105,6 @@ export default function InfoBar(props) {
 
   const handleEnter = async (e) => {
     if (e.key === 'Enter') {
-      if(player.length == 1){
-        toast.error("Waiting for players to join", {autoClose : 1000})
-        return;
-      }
       if (item === answer) {
         toast.success("Right Answer, points updated", { autoClose: 1000 });
         socket.emit("updatePlayerPoints", { name, drawTime, room, playerID });
@@ -131,10 +128,10 @@ export default function InfoBar(props) {
     socket.on('updatePlayerPoints', ({ players }) => {
       setplayer(players);
     });
-    socket.on("gameOver", () => {
+    socket.on("gameOver", ()=>{
       setStartDisable(false);
     })
-    return () => {
+    return () =>{ 
       socket.off('updatePlayerPoints');
       socket.off('gameOver');
     }

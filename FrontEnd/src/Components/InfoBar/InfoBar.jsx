@@ -44,7 +44,7 @@ export default function InfoBar(props) {
   }, [drawTime]);
 
   async function chooseWordWait() {
-    return new Promise((resolve) => setTimeout(resolve, 7000));
+    return new Promise((resolve) => setTimeout(resolve, 25000));
   }
 
   useEffect(() => {
@@ -55,14 +55,14 @@ export default function InfoBar(props) {
 
       if (currentPlayer?.name === name) {
         setCountdown(5);
-        setDrawTime(7);
+        setDrawTime(25);
         whoDrawingNow.current.style.display = "none";
         questions.current.style.display = "flex";
         setInputDisable(true);
         await chooseWordWait();
       }
       else {
-        setDrawTime(7);
+        setDrawTime(25);
         setPlayerDrawing(currentPlayer?.name || '');
         whoDrawingNow.current.style.display = "flex";
         setInputDisable(false);
@@ -100,7 +100,7 @@ export default function InfoBar(props) {
         clearInterval(interval);
         socket.emit('gameOver', { room });
       }
-    }, 7000);
+    }, 25000);
   };
 
   const handleEnter = async (e) => {

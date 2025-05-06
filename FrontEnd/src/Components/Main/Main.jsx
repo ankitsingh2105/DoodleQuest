@@ -8,8 +8,8 @@ import Chat from '../Chat/Chat';
 import Players from '../Players/Players';
 import InfoBar from '../InfoBar/InfoBar';
 import { toast } from 'react-toastify';
-import backendLink from '../../../backendlink.js';
-import websocket from '../../../socket';
+import backendLink from '@/backendlink.js';
+import websocket from '@/socket.js';
 
 export default function Main() {
     const [searchParams] = useSearchParams();

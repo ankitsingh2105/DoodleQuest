@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 
-import backendlink from "./src/backendlink";
+import backendLink from "./backendlink";
 
-const socket = io(`${backendlink}`);
+const socket = io(`${backendLink}`);
 
 export default socket ;  

@@ -104,6 +104,10 @@ export default function InfoBar(props) {
 
   const handleEnter = async (e) => {
     if (e.key === 'Enter') {
+      if(player.length == 1){
+        toast.error("Waiting for players to join", {autoClose : 1000})
+        return;
+      }
       if (item === answer) {
         toast.success("Right Answer, points updated", { autoClose: 1000 });
         socket.emit("updatePlayerPoints", { name, drawTime, room, playerID });
@@ -127,10 +131,10 @@ export default function InfoBar(props) {
     socket.on('updatePlayerPoints', ({ players }) => {
       setplayer(players);
     });
-    socket.on("gameOver", ()=>{
+    socket.on("gameOver", () => {
       setStartDisable(false);
     })
-    return () =>{ 
+    return () => {
       socket.off('updatePlayerPoints');
       socket.off('gameOver');
     }

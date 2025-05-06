@@ -30,6 +30,7 @@ export default function Main() {
     const navigate = useNavigate();
 
     // * learning ::  Most browsers block async operations (like socket calls) inside beforeunload.
+    // handle this later
     // const handleOnoad = (event) => {
     //     socket.current.emit("userDisconnected", { name, room });
     //     socket.current.disconnect();

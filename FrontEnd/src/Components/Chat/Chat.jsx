@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import "./Chat.css"
 
 export default function Chat({ name, room, socket }) {
   const [message, setMessage] = useState("");
@@ -32,7 +33,7 @@ export default function Chat({ name, room, socket }) {
   }, [socket]);
 
   return (
-    <div className="flex flex-col h-full  border-4 rounded-2xl border-dashed border-pink-400 shadow-md bg-white">
+    <div className="flex flex-col h-full border-4 rounded-2xl border-dashed border-pink-400 shadow-md bg-white">
 
       {/* Chat Header */}
       <div className="bg-indigo-600 text-white px-6 py-4 border-4 rounded-2xl">
@@ -41,7 +42,7 @@ export default function Chat({ name, room, socket }) {
       </div>
 
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col-reverse h-96">
+      <div className="overflow-auto heigh p-4 flex flex-col-reverse h-100">
         {allMessages.slice().reverse().map((msg, index) => (
           <div
             key={index}

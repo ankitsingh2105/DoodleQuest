@@ -24,10 +24,10 @@ export default function Main() {
     const [playerID, setPlayerID] = useState("");
     const [hasJoined, setHasJoined] = useState(false);
 
+    const [disableCanvas, setDisableCanvas] = useState(false);
+
     const playerIDRef = useRef(null); // todo :: to prevent the stale value and prevent wrong updates
     const finalScorecard = useRef(null); // todo : scoreCard hidden;
-
-    const navigate = useNavigate();
 
     // * learning ::  Most browsers block async operations (like socket calls) inside beforeunload.
     // handle this later
@@ -266,7 +266,7 @@ export default function Main() {
 
                 {/* InfoBar */}
                 <section className="w-full max-w-6xl bg-white rounded-2xl shadow-lg p-4">
-                    <InfoBar playerID={playerID} setplayer={setplayers} player={players} name={name} room={room} socket={socket.current} />
+                    <InfoBar setDisableCanvas={setDisableCanvas} playerID={playerID} setplayer={setplayers} player={players} name={name} room={room} socket={socket.current} />
                 </section>
 
                 <section className="flex flex-col lg:flex-row w-full max-w-6xl gap-6">
@@ -288,7 +288,7 @@ export default function Main() {
                             onMouseUp={finishDrawing}
                             onMouseMove={draw}
                             onMouseLeave={finishDrawing}
-                            className="border border-gray-300 bg-white rounded-lg"
+                            className={`border border-gray-300 bg-white rounded-lg ${disableCanvas ? "pointer-events-none" : "pointer-events-auto"}`}
                         />
                         <section className="flex">
                             <div className="mt-4 mr-4 flex flex-wrap gap-2">

@@ -3,7 +3,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function InfoBar(props) {
-  const { playerID, socket, player, name, setplayer, room } = props;
+  const { playerID, socket, player, name, setplayer, room, setDisableCanvas } = props;
 
   const [answer, setAnswer] = useState("");
   const [item, setItem] = useState("");
@@ -59,6 +59,7 @@ export default function InfoBar(props) {
         whoDrawingNow.current.style.display = "none";
         questions.current.style.display = "flex";
         setInputDisable(true);
+        setDisableCanvas(false);
         await chooseWordWait();
       }
       else {
@@ -66,6 +67,7 @@ export default function InfoBar(props) {
         setPlayerDrawing(currentPlayer?.name || '');
         whoDrawingNow.current.style.display = "flex";
         setInputDisable(false);
+        setDisableCanvas(true);
       }
     };
 
@@ -79,6 +81,7 @@ export default function InfoBar(props) {
 
   const StartGame = async () => {
     setInputDisable(false);
+    setDisableCanvas(false);
     // questions.current.style.display = "flex";
     let loopCount = player.length;
     console.log("number of players:: " , loopCount);
@@ -94,9 +97,11 @@ export default function InfoBar(props) {
         currentIteration++;
         socket.emit('myEvent', { currentIteration, room });
         setInputDisable(false);
+        setDisableCanvas(false);
       }
       else {
         setInputDisable(false);
+        setDisableCanvas(false);
         clearInterval(interval);
         socket.emit('gameOver', { room });
       }
@@ -108,8 +113,9 @@ export default function InfoBar(props) {
       if (item === answer) {
         toast.success("Right Answer, points updated", { autoClose: 1000 });
         socket.emit("updatePlayerPoints", { name, drawTime, room, playerID });
-        setInputDisable(true)
-      } else {
+        setInputDisable(true);
+      } 
+      else {
         toast.error(`Wrong Guess`, { autoClose: 1000 });
       }
     }

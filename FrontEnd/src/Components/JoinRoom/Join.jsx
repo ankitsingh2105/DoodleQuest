@@ -1,10 +1,12 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import "./Join.css"
 import "./Join.css";
 
 const Home = () => {
+    const navigate = useNavigate();
+
     const handleJoinRoom = () => {
         const playerName = document.getElementById('playerName').value;
         const roomId = document.getElementById('roomId').value;
@@ -76,7 +78,12 @@ const Home = () => {
                                     <input onChange={(event) => setroom(event.target.value)} type="text" id="roomId" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter room ID" />
                                 </div>
                                 <div className="flex gap-4">
-                                    <button onClick={handleJoinRoom} className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition shadow-md">
+                                    <button onKeyDown={(e)=>{
+                                        if (e.key === "Enter") {
+                                            navigate(`/room?roomID=${room}&name=${userName}`)
+                                        }
+                                    }} 
+                                    onClick={handleJoinRoom} className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition shadow-md">
                                         <Link style={{
                                             textDecoration: "none",
                                             color: "white",

@@ -37,7 +37,7 @@ https://github.com/ankitsingh2105/DoodleQuest/assets/88767069/69482ff1-d62f-4d3f
 ## FrontEnd
 - Open a new terminal.
 
-- Navigate to the `Scribble_MERN` directory:
+- Navigate to the `FrontEnd` directory:
    ```bash
    cd Scribble_MERN
 
@@ -46,4 +46,4 @@ https://github.com/ankitsingh2105/DoodleQuest/assets/88767069/69482ff1-d62f-4d3f
    npm run dev
 
 ## About the Author
-- **Ankit Singh Chauhan:** Visit [ankitsinghchauhan.in](https://ankitsinghchauhan.in) for more.
+- **Ankit Singh Chauhan:** [ankitsinghchauhan.in](https://ankitsinghchauhan.in).

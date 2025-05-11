@@ -1,4 +1,8 @@
-# DOODLEQUEST
+# DOODLEQUEST 
+<img width="25" alt="save" src="https://github.com/user-attachments/assets/2833dea5-fed9-4aae-a8a4-92bc08595614" />
+
+---
+
 
 ## Description
 Multiplayer online drawing and guessing game inspired by Scribble. It allows users to connect with friends, chat in real-time, and engage in a creative and interactive gameplay experience.
@@ -60,6 +64,8 @@ Multiplayer online drawing and guessing game inspired by Scribble. It allows use
 - Run:
    ```bash
    npm run dev
+
+---
 
 ## About the Author
 - **Ankit Singh Chauhan:** [ankitsinghchauhan.in](https://ankitsinghchauhan.in).

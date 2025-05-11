@@ -1,5 +1,4 @@
 # DOODLEQUEST 
----
 
 ## Description
 Multiplayer online drawing and guessing game inspired by Scribble. It allows users to connect with friends, chat in real-time, and engage in a creative and interactive gameplay experience.

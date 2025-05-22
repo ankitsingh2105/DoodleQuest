@@ -32,6 +32,7 @@ Multiplayer online drawing and guessing game inspired by Scribble. It allows use
 - **State Management:** Learned to lift state in React for smoother component communication.
 - **Closures:** Applied closures to maintain variable scope in socket event handlers and timers.
 - **Throttling:** Implemented throttling techniques to optimise drawing performance.
+- **Caching:** Used server-side caching to avoid relatively expensive DB calls.
 - **Component Design:** Gained experience designing modular and reusable React components.
 - **Real-Time Architecture:** Understood how to structure backend logic for real-time multiplayer systems.
 

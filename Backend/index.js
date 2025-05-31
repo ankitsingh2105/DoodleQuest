@@ -3,11 +3,14 @@ const app = express();
 const http = require("http");
 const cors = require("cors");
 
+// for observability
+const responseTime = require("response-time");
+const client = require("prom-client");
+
 const { Server } = require("socket.io");
 
 const server = http.createServer(app);
 
-// origin: "https://doodlequest.vercel.app",
 const corsOptions = {
     origin: ["http://localhost:5173", "https://doodlequest.vercel.app", "https://doodlequest.games"],
     credentials: true,
@@ -15,7 +18,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// origin: "http://localhost:5173",
 const io = new Server(server, {
     cors: {
         origin: ["https://doodlequest.vercel.app", "http://localhost:5173", "https://doodlequest.games"],
@@ -24,22 +26,93 @@ const io = new Server(server, {
 });
 
 
+const { createLogger, format } = require("winston");
+const LokiTransport = require("winston-loki");
+
+const logger = createLogger({
+  format: format.json(),
+  transports: [
+    new LokiTransport({
+      host: "http://127.0.0.1:3100",
+      labels: { job: "express-app" },
+      json: true,
+      format: format.json(),
+      handleExceptions: true,
+      replaceTimestamp: true,
+    }),
+  ],
+});
+
+const register = new client.Registry();
+client.collectDefaultMetrics({ register });
+
+const activeUsersGauge = new client.Gauge({
+  name: "active_users_total",
+  help: "Total number of active socket connections",
+});
+
+const activeRooms = new client.Gauge({
+  name: "active_rooms_total",
+  help: "Total number of active rooms",
+});
+register.registerMetric(activeUsersGauge);
+
+
+const requestCounter = new client.Counter({
+  name: "custom_total_request_counter",
+  help: "Total request count",
+  labelNames: ["method", "route"],
+});
+
+register.registerMetric(activeUsersGauge);
+
+register.registerMetric(activeRooms);
+
+register.registerMetric(requestCounter);
+
+app.use(
+  responseTime((req, res, time) => {
+    if (req.url === "/metrics") return;
+
+    const route = req.route?.path || req.path;
+    requestCounter.labels(req.method, route).inc();
+
+    if (monitoredRoutes.includes(route)) {
+      logger.info(`Request to ${route}`, {
+        method: req.method,
+        status: res.statusCode,
+        duration: time.toFixed(2),
+      });
+    }
+  })
+);
+
+// Metrics endpoint
+app.get("/metrics", async (req, res) => {
+  res.setHeader("Content-Type", register.contentType);
+  res.end(await register.metrics());
+});
+
+
 // Store room data in a Map
 const rooms = new Map();
 
 io.on("connection", (client) => {
     console.log(`New user ::${client.id}`);
-
+    activeUsersGauge.inc();
     client.on("disconnect", async () => {
         console.log("user disconnected ::", client.id);
+        activeUsersGauge.dec();
+        
     });
-
+    
     client.on("join-room", async (info) => {
         const { room, name } = info;
         console.log(`User ${client.id} joined room: ${room}`);
-
+        
         if (!rooms.has(room)) {
             rooms.set(room, new Set());
+            activeRooms.inc();
         }
         const newPlayer = { name, socketID: client.id, points: 0 };
 
@@ -58,20 +131,31 @@ io.on("connection", (client) => {
     });
 
     client.on("draw", ({ room, offsetX, offsetY, color }) => {
+        logger.info("Draw event 1");
         io.to(room).emit("draw", { offsetX, offsetY, color, socketID: client.id });
     });
-
+    
     client.on("stopDrawing", (room) => {
+        logger.info("Draw event 2");
         io.to(room).emit("stopDrawing", { room, playerID: client.id });
     });
-
+    
     client.on("clear", ({ room, width, height }) => {
+        logger.info("Draw event 3");
         io.to(room).emit("clear", { width, height });
+    });
+    
+    
+    client.on("beginPath", ({ room, offsetX, offsetY }) => {
+        logger.info("Draw event 4");
+        console.log("beginnin the fucking path")
+        client.to(room).emit("beginPath", { offsetX, offsetY, socketID: client.id });
     });
 
 
     // todo :: chatting 
     client.on("sendMessage", (info) => {
+        logger.info("Chat event 1");
         const room = info.room;
         io.to(room).emit("receiveMessage", info);
     })
@@ -81,21 +165,19 @@ io.on("connection", (client) => {
         console.log(`Received from ${client.id}:`, currentIteration);
         io.to(room).emit('acknowledgement', {currentIteration, loopCount});
     });
-
-    client.on("beginPath", ({ room, offsetX, offsetY }) => {
-        console.log("beginnin the fucking path")
-        client.to(room).emit("beginPath", { offsetX, offsetY, socketID: client.id });
-    });
-
-
+    
+    
+    
     // todo :: word to find
     client.on("wordToGuess", ({ word, room }) => {
+        logger.info("Guess the word");
         console.log("word is :: ", word)
         io.to(room).emit("wordToGuess", word);
     })
-
+    
     // todo :: updating points
     client.on("updatePlayerPoints", async ({ playerID, name, drawTime, room }) => {
+        logger.info("Updating the points");
         console.log("in the server side for updating with :: ", name, drawTime, playerID);
         const players = rooms.get(room);
 

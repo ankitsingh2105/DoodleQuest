@@ -60,7 +60,6 @@ export default function Main() {
                 return;
             }
             const context = contextRef.current;
-            setStrokeSize(strokeSize);
             context.strokeStyle = color;
             context.lineWidth = strokeSize
             context.lineTo(offsetX, offsetY);
@@ -79,13 +78,14 @@ export default function Main() {
             context.closePath();
         };
 
-        const handleBeginPath = ({ socketID }) => {
+        const handleBeginPath = ({ socketID, strokeSize }) => {
             if (socketID === playerIDRef.current) {
                 return;
             }
             const context = contextRef.current;
             // console.log("player id on socket is ", playerID);
             context.beginPath();
+            context.lineWidth = strokeSize;
         };
 
         const handleUpdatePlayerList = (updatedPlayers) => {

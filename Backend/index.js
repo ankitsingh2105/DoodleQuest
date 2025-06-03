@@ -147,10 +147,10 @@ io.on("connection", (client) => {
     });
     
     
-    client.on("beginPath", ({ room, offsetX, offsetY }) => {
+    client.on("beginPath", ({ room, offsetX, offsetY, strokeSize }) => {
         logger.info("Draw event 4");
         console.log("beginnin the fucking path")
-        client.to(room).emit("beginPath", { offsetX, offsetY, socketID: client.id });
+        client.to(room).emit("beginPath", { offsetX, offsetY, socketID: client.id, strokeSize });
     });
 
 

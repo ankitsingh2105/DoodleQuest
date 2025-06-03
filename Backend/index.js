@@ -130,9 +130,10 @@ io.on("connection", (client) => {
         io.to(room).emit("newPlayer", { room, name, playerSocketID: client.id });
     });
 
-    client.on("draw", ({ room, offsetX, offsetY, color }) => {
+    client.on("draw", ({ room, offsetX, offsetY, color, strokeSize }) => {
         logger.info("Draw event 1");
-        io.to(room).emit("draw", { offsetX, offsetY, color, socketID: client.id });
+        console.log("size sss :: " , strokeSize)
+        io.to(room).emit("draw", { offsetX, offsetY, color, socketID: client.id, strokeSize });
     });
     
     client.on("stopDrawing", (room) => {

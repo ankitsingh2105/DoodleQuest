@@ -1,25 +1,26 @@
-import React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import "./Join.css"
 import "./Join.css";
+import {ToastContainer, toast} from "react-toastify"
 
 const Home = () => {
     const navigate = useNavigate();
-
+    const [navLink, setNavLink] = useState("/");
     const handleJoinRoom = () => {
         const playerName = document.getElementById('playerName').value;
         const roomId = document.getElementById('roomId').value;
 
         if (!playerName) {
-            alert('Please enter your name to join a room!');
+            toast.error('Please enter your name to join a room!', {autoClose : 1000});
             return;
         }
 
         if (!roomId) {
-            alert('Please enter a room ID to join!');
+            toast.error('Please enter a room ID to join!', {autoClose : 1000});
             return;
         }
+        navigate(`/room?roomID=${room}&name=${userName}`)
     };
 
     const [userName, setuserName] = useState("")
@@ -37,7 +38,7 @@ const Home = () => {
 
     return (
         <div className="font-['Fredoka'] bg-[#f0f9ff] relative overflow-hidden">
-
+            <ToastContainer/>
             {/* Navigation */}
             <nav className="bg-white bg-opacity-90 backdrop-blur-sm shadow-md py-4 px-6 sticky top-0 z-50">
                 <div className="container mx-auto flex justify-between items-center">
@@ -80,7 +81,7 @@ const Home = () => {
                                 <div className="flex gap-4">
                                     <button onKeyDown={(e)=>{
                                         if (e.key === "Enter") {
-                                            navigate(`/room?roomID=${room}&name=${userName}`)
+                                            navigate(navLink)
                                         }
                                     }} 
                                     onClick={handleJoinRoom} className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition shadow-md">
@@ -88,7 +89,7 @@ const Home = () => {
                                             textDecoration: "none",
                                             color: "white",
                                             fontFamily: "Courier New', Courier, monospace"
-                                        }} to={`/room?roomID=${room}&name=${userName}`} >Join Room</Link>
+                                        }} to={navLink} >Join Room</Link>
                                     </button>
                                 </div>
                             </div>

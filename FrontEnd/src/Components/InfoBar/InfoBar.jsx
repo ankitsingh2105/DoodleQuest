@@ -17,6 +17,8 @@ export default function InfoBar(props) {
 
   const questions = useRef(null);
   const whoDrawingNow = useRef(null);
+  let correct_answer = new Audio("/correct-answer.mp3");
+  let incorrect_answer = new Audio("/incorrect-answer.mp3");
 
   const wordArray = [
     { 1: "mango", 2: "banana", 3: "cherry" },
@@ -48,7 +50,7 @@ export default function InfoBar(props) {
   }
 
   useEffect(() => {
-    const handleAcknowledgement = async ({currentIteration, loopCount}) => {
+    const handleAcknowledgement = async ({ currentIteration, loopCount }) => {
       setStartDisable(true);
       const currentPlayer = player[currentIteration];
       setrandom(Math.floor(Math.random() * 5));
@@ -84,7 +86,7 @@ export default function InfoBar(props) {
     setDisableCanvas(false);
     // questions.current.style.display = "flex";
     let loopCount = player.length;
-    console.log("number of players:: " , loopCount);
+    console.log("number of players:: ", loopCount);
     if (loopCount == 1) {
       toast.error("Waiting for other players!", { autoClose: 1000 });
       return;
@@ -111,11 +113,13 @@ export default function InfoBar(props) {
   const handleEnter = async (e) => {
     if (e.key === 'Enter') {
       if (item === answer) {
+        correct_answer.play();
         toast.success("Right Answer, points updated", { autoClose: 1000 });
         socket.emit("updatePlayerPoints", { name, drawTime, room, playerID });
         setInputDisable(true);
-      } 
+      }
       else {
+        incorrect_answer.play();
         toast.error(`Wrong Guess`, { autoClose: 1000 });
       }
     }
@@ -134,15 +138,23 @@ export default function InfoBar(props) {
     socket.on('updatePlayerPoints', ({ players }) => {
       setplayer(players);
     });
-    socket.on("gameOver", ()=>{
+    socket.on("gameOver", () => {
       setStartDisable(false);
     })
-    return () =>{ 
+    return () => {
       socket.off('updatePlayerPoints');
       socket.off('gameOver');
     }
 
   }, [socket]);
+
+  const handleWordSelect = (num) => {
+    const selectedWord = wordArray[random][num];
+    socket.emit("wordToGuess", { word: selectedWord, room });
+    setItem(selectedWord);
+    questions.current.style.display = "none";
+  };
+
 
   return (
     <div className="flex flex-col items-center justify-center p-0.5">
@@ -199,11 +211,7 @@ export default function InfoBar(props) {
             {[1, 2, 3].map((num) => (
               <div
                 key={num}
-                onClick={async () => {
-                  await socket.emit("wordToGuess", { word: wordArray[random][num], room });
-                  setItem(wordArray[random][num]);
-                  questions.current.style.display = "none";
-                }}
+                onClick={() => { handleWordSelect(num) }}
                 className="cursor-pointer px-4 py-2 rounded-md text-black font-medium border-2 border-pink-400 border-dashed"
               >
                 {wordArray[random][num]}

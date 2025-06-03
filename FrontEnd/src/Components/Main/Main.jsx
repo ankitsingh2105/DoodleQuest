@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import io from "socket.io-client";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
+import { Eraser } from 'lucide-react';
+import "./Main.css"
 
 import "./Main.css";
 import Chat from '../Chat/Chat';
@@ -23,31 +25,23 @@ export default function Main() {
     const [players, setplayers] = useState([])
     const [playerID, setPlayerID] = useState("");
     const [hasJoined, setHasJoined] = useState(false);
+    const strokeSizeRef = useRef(null);
+    const [strokeSize, setStrokeSize] = useState(5);
 
     const [disableCanvas, setDisableCanvas] = useState(false);
 
     const playerIDRef = useRef(null); // todo :: to prevent the stale value and prevent wrong updates
     const finalScorecard = useRef(null); // todo : scoreCard hidden;
 
-    // * learning ::  Most browsers block async operations (like socket calls) inside beforeunload.
-    // handle this later
-    // const handleOnoad = (event) => {
-    //     socket.current.emit("userDisconnected", { name, room });
-    //     socket.current.disconnect();
-    //     window.location.href = "/"
-    // };
-    // window.addEventListener("load", handleOnoad);
-
     useEffect(() => {
         toast.success("This service is running on a free tier, might take some time to load", { autoClose: 1500 });
     }, [])
-
 
     useEffect(() => {
         // Only create socket connection once
         if (!socket.current) {
             socket.current = io.connect(`${backendLink}`);
-        } 
+        }
 
         // todo :: want to prenet multiple joining of the same using, with different socket ids
         if (!hasJoined) {
@@ -61,12 +55,14 @@ export default function Main() {
             socket.current = io.connect(`${backendLink}`);
         }
 
-        const handleDraw = ({ offsetX, offsetY, color, socketID }) => {
-            if(socketID === playerIDRef.current){
+        const handleDraw = ({ offsetX, offsetY, color, socketID, strokeSize }) => {
+            if (socketID === playerIDRef.current) {
                 return;
             }
             const context = contextRef.current;
+            setStrokeSize(strokeSize);
             context.strokeStyle = color;
+            context.lineWidth = strokeSize
             context.lineTo(offsetX, offsetY);
             context.stroke();
         };
@@ -76,7 +72,7 @@ export default function Main() {
             const context = contextRef.current;
             context.clearRect(0, 0, canvas.width, canvas.height);
             context.beginPath();
-        }; 
+        };
 
         const handleStopDrawing = () => {
             const context = contextRef.current;
@@ -84,8 +80,6 @@ export default function Main() {
         };
 
         const handleBeginPath = ({ socketID }) => {
-            console.log("playerID : ", playerID);
-            console.log("socketID: ", socketID);
             if (socketID === playerIDRef.current) {
                 return;
             }
@@ -147,6 +141,11 @@ export default function Main() {
         // console.log("see this one only  :: player id value updated ****** ::: ", playerID);
     }, [playerID]);
 
+
+    useEffect(()=>{
+        strokeSizeRef.current = strokeSize;
+    },[strokeSize])
+
     // useEffect for convas 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -156,13 +155,15 @@ export default function Main() {
         context.strokeStyle = color;
         context.lineWidth = 5;
         contextRef.current = context;
-    }, [color]); // only rerun when color changes
+    }, [color]); // only return when color changes
 
 
     const startDrawing = ({ offsetX, offsetY }) => {
         contextRef.current.beginPath();
         contextRef.current.moveTo(offsetX, offsetY);
-        socket.current.emit("beginPath", { room, offsetX, offsetY });
+        contextRef.current.lineWidth = strokeSize;
+        contextRef.current.strokeStyle = color;
+        socket.current.emit("beginPath", { room, offsetX, offsetY, strokeSize });
         setIsDrawing(true);
     };
 
@@ -188,14 +189,14 @@ export default function Main() {
         context.lineTo(offsetX, offsetY);
         context.stroke();
 
-        throttledEmitDraw(offsetX, offsetY, color);
+        throttledEmitDraw(offsetX, offsetY, color, strokeSize);
     };
 
     //todo :: Each mouse movement sends a request via WebSocket. To limit how often requests are sent, I used the throttle function.
 
     // used throttling, and closure
-    const throttledEmitDraw = throttle(function (offsetX, offsetY, color) {
-        socket.current.emit("draw", { room, offsetX, offsetY, color });
+    const throttledEmitDraw = throttle(function (offsetX, offsetY, color, strokeSize) {
+        socket.current.emit("draw", { room, offsetX, offsetY, color, strokeSize });
     }, 20); // * req after 20ms only
 
 
@@ -226,7 +227,6 @@ export default function Main() {
         '#EF4444',
         '#F97316',
         '#FACC15',
-        '#4ADE80',
         '#22D3EE',
         '#3B82F6',
         '#8B5CF6',
@@ -244,7 +244,7 @@ export default function Main() {
                 {/* Result */}
                 <center>
                     <div ref={finalScorecard} className="hidden fixed top-1/3 left-0 right-0 border-7 border-dashed border-blue-300 rounded-4xl p-6 max-w-lg mx-auto bg-white shadow-lg">
-                        <div onClick={()=>{finalScorecard.current.style.display = "none";}} className="hover:cursor-pointer absolute top-2 right-2 text-2xl font-bold">x</div>
+                        <div onClick={() => { finalScorecard.current.style.display = "none"; }} className="hover:cursor-pointer absolute top-2 right-2 text-2xl font-bold">x</div>
                         <h1 className="underline text-2xl font-bold text-blue-500 mb-4">Final Scorecard</h1>
                         <ul className="space-y-2">
                             {[...players]
@@ -281,7 +281,7 @@ export default function Main() {
                     {/*todo : Drawing Canvas */}
                     <section className="flex-1 flex flex-col items-center bg-white rounded-2xl shadow-lg p-6">
                         <canvas
-                            width="600px" 
+                            width="600px"
                             height="450px"
                             ref={canvasRef}
                             onMouseDown={startDrawing}
@@ -290,26 +290,41 @@ export default function Main() {
                             onMouseLeave={finishDrawing}
                             className={`border border-gray-300 bg-white rounded-lg ${disableCanvas ? "pointer-events-none" : "pointer-events-auto"}`}
                         />
-                        <section className="flex">
-                            <div className="mt-4 mr-4 flex flex-wrap gap-2">
-                                {colors.map((c) => (
-                                    <div
-                                        key={c}
-                                        onClick={() => handleColorChange({ target: { value: c } })}
-                                        className="w-10 h-10 rounded-full cursor-pointer border-2 border-gray-300 hover:scale-110 transition-transform"
-                                        style={{ backgroundColor: c }}
-                                    />
-                                ))}
-                            </div>
+                        <section className="flex-row align-center justify-center">
+                            <section className='flex'>
+                                <div className="mt-4 mr-4 flex flex-wrap gap-2">
+                                    {colors.map((c) => (
+                                        <div
+                                            key={c}
+                                            onClick={() => handleColorChange({ target: { value: c } })}
+                                            className="w-10 h-10 rounded-full cursor-pointer border-2 border-gray-300 hover:scale-110 transition-transform"
+                                            style={{ backgroundColor: c }}
+                                        />
+                                    ))}
+                                </div>
+                                <div onClick={() => { toast.info("Eraser selected", { autoClose: 300 }); setColor("white") }} className='m-4 ml-0 hover:cursor-pointer'>
+                                    <Eraser size={38} className="text-gray-600" />
+                                </div>
 
-                            <div className="mt-4">
-                                <button
-                                    onClick={clearCanvas}
-                                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg"
-                                >
-                                    Clear
-                                </button>
-                            </div>
+                                <div className="mt-4">
+                                    <button
+                                        onClick={clearCanvas}
+                                        className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg hover:cursor-pointer"
+                                    >
+                                        Clear
+                                    </button>
+                                </div>
+                            </section>
+                            <section className='flex align-center justify-center'>
+                                <input
+                                    type="range"
+                                    min="1"
+                                    max="50"
+                                    value={strokeSize}
+                                    onChange={(e) => setStrokeSize((e.target.value))}
+                                    className="slider w-64 h-10 accent-blue-600"
+                                />
+                            </section>
                         </section>
                     </section>
 

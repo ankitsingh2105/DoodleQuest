@@ -86,7 +86,7 @@ export default function InfoBar(props) {
     setDisableCanvas(false);
     // questions.current.style.display = "flex";
     let loopCount = player.length;
-    console.log("number of players:: ", loopCount);
+    // console.log("number of players:: ", loopCount);
     if (loopCount == 1) {
       toast.error("Waiting for other players!", { autoClose: 1000 });
       return;

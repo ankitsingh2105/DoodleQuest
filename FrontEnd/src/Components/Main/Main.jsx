@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import io from "socket.io-client";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import { Eraser } from 'lucide-react';
@@ -11,7 +10,7 @@ import Players from '../Players/Players';
 import InfoBar from '../InfoBar/InfoBar';
 import { toast } from 'react-toastify';
 import backendLink from '@/backendlink.js';
-import websocket from '@/socket.js';
+import websocket from './socket.js';
 
 export default function Main() {
     const [searchParams] = useSearchParams();
@@ -24,37 +23,38 @@ export default function Main() {
     const [color, setColor] = useState('#000000');
     const [players, setplayers] = useState([])
     const [playerID, setPlayerID] = useState("");
-    const [hasJoined, setHasJoined] = useState(false);
     const strokeSizeRef = useRef(null);
     const [strokeSize, setStrokeSize] = useState(5);
-
     const [disableCanvas, setDisableCanvas] = useState(false);
 
     const playerIDRef = useRef(null); // todo :: to prevent the stale value and prevent wrong updates
     const finalScorecard = useRef(null); // todo : scoreCard hidden;
+    const navigate = useNavigate();
 
     useEffect(() => {
         toast.success("This service is running on a free tier, might take some time to load", { autoClose: 1500 });
+        console.log('%c⚡WELCOME⚡', 'font-size: 32px; color: LIGHTGREEN; font-weight: bold;');
+
     }, [])
 
     useEffect(() => {
-        // Only create socket connection once
-        if (!socket.current) {
-            socket.current = io.connect(`${backendLink}`);
+        if (!socket.current.connected) {
+            socket.current.connect();
         }
-
-        // todo :: want to prenet multiple joining of the same using, with different socket ids
-        if (!hasJoined) {
-            socket.current.emit("join-room", { room, name });
-            setHasJoined(true);
-        }
-    }, [hasJoined, room, name]);
+        socket.current.emit("join-room", { room, name });
+    }, [room, socket]);
 
     useEffect(() => {
-        if (!socket.current) {
-            socket.current = io.connect(`${backendLink}`);
-        }
+        // todo : this runs exactly once when the component unmounts like navigating away or hitting the back button
+        return () => {
+            if (socket.current && socket.current.connected) {
+                socket.current.disconnect();
+            }
+        };
+    }, []);
 
+
+    useEffect(() => {
         const handleDraw = ({ offsetX, offsetY, color, socketID, strokeSize }) => {
             if (socketID === playerIDRef.current) {
                 return;
@@ -142,9 +142,9 @@ export default function Main() {
     }, [playerID]);
 
 
-    useEffect(()=>{
+    useEffect(() => {
         strokeSizeRef.current = strokeSize;
-    },[strokeSize])
+    }, [strokeSize])
 
     // useEffect for convas 
     useEffect(() => {

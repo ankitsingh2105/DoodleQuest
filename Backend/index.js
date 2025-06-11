@@ -30,38 +30,38 @@ const { createLogger, format } = require("winston");
 const LokiTransport = require("winston-loki");
 
 const logger = createLogger({
-  format: format.json(),
-  transports: [
-    new LokiTransport({
-      host: "http://127.0.0.1:3100",
-      labels: { job: "express-app" },
-      json: true,
-      format: format.json(),
-      handleExceptions: true,
-      replaceTimestamp: true,
-    }),
-  ],
+    format: format.json(),
+    transports: [
+        new LokiTransport({
+            host: "http://127.0.0.1:3100",
+            labels: { job: "express-app" },
+            json: true,
+            format: format.json(),
+            handleExceptions: true,
+            replaceTimestamp: true,
+        }),
+    ],
 });
 
 const register = new client.Registry();
 client.collectDefaultMetrics({ register });
 
 const activeUsersGauge = new client.Gauge({
-  name: "active_users_total",
-  help: "Total number of active socket connections",
+    name: "active_users_total",
+    help: "Total number of active socket connections",
 });
 
 const activeRooms = new client.Gauge({
-  name: "active_rooms_total",
-  help: "Total number of active rooms",
+    name: "active_rooms_total",
+    help: "Total number of active rooms",
 });
 register.registerMetric(activeUsersGauge);
 
 
 const requestCounter = new client.Counter({
-  name: "custom_total_request_counter",
-  help: "Total request count",
-  labelNames: ["method", "route"],
+    name: "custom_total_request_counter",
+    help: "Total request count",
+    labelNames: ["method", "route"],
 });
 
 register.registerMetric(activeUsersGauge);
@@ -71,45 +71,43 @@ register.registerMetric(activeRooms);
 register.registerMetric(requestCounter);
 
 app.use(
-  responseTime((req, res, time) => {
-    if (req.url === "/metrics") return;
+    responseTime((req, res, time) => {
+        if (req.url === "/metrics") return;
 
-    const route = req.route?.path || req.path;
-    requestCounter.labels(req.method, route).inc();
+        const route = req.route?.path || req.path;
+        requestCounter.labels(req.method, route).inc();
 
-    if (monitoredRoutes.includes(route)) {
-      logger.info(`Request to ${route}`, {
-        method: req.method,
-        status: res.statusCode,
-        duration: time.toFixed(2),
-      });
-    }
-  })
+        if (monitoredRoutes.includes(route)) {
+            logger.info(`Request to ${route}`, {
+                method: req.method,
+                status: res.statusCode,
+                duration: time.toFixed(2),
+            });
+        } 
+    })
 );
 
 // Metrics endpoint
 app.get("/metrics", async (req, res) => {
-  res.setHeader("Content-Type", register.contentType);
-  res.end(await register.metrics());
+    res.setHeader("Content-Type", register.contentType);
+    res.end(await register.metrics());
 });
 
 
 // Store room data in a Map
 const rooms = new Map();
+const playerToRoom = new Map();
 
 io.on("connection", (client) => {
     console.log(`New user ::${client.id}`);
     activeUsersGauge.inc();
-    client.on("disconnect", async () => {
-        console.log("user disconnected ::", client.id);
-        activeUsersGauge.dec();
-        
-    });
-    
+
     client.on("join-room", async (info) => {
         const { room, name } = info;
         console.log(`User ${client.id} joined room: ${room}`);
-        
+
+        playerToRoom.set(client.id, room);
+
         if (!rooms.has(room)) {
             rooms.set(room, new Set());
             activeRooms.inc();
@@ -125,34 +123,30 @@ io.on("connection", (client) => {
         // Emit updated player list to all clients in the room
         io.to(room).emit("updatePlayerList", Array.from(rooms.get(room)));
 
-        console.log("client id for newplayer event :: ", client.id);
 
         io.to(room).emit("newPlayer", { room, name, playerSocketID: client.id });
     });
 
     client.on("draw", ({ room, offsetX, offsetY, color, strokeSize }) => {
         logger.info("Draw event 1");
-        console.log("size sss :: " , strokeSize)
         io.to(room).emit("draw", { offsetX, offsetY, color, socketID: client.id, strokeSize });
     });
-    
+
     client.on("stopDrawing", (room) => {
         logger.info("Draw event 2");
         io.to(room).emit("stopDrawing", { room, playerID: client.id });
     });
-    
+
     client.on("clear", ({ room, width, height }) => {
         logger.info("Draw event 3");
         io.to(room).emit("clear", { width, height });
     });
-    
-    
+
+
     client.on("beginPath", ({ room, offsetX, offsetY, strokeSize }) => {
         logger.info("Draw event 4");
-        console.log("beginnin the fucking path")
         client.to(room).emit("beginPath", { offsetX, offsetY, socketID: client.id, strokeSize });
     });
-
 
     // todo :: chatting 
     client.on("sendMessage", (info) => {
@@ -164,18 +158,18 @@ io.on("connection", (client) => {
     // todo :: choosing the players
     client.on('myEvent', ({ currentIteration, room, loopCount }) => {
         console.log(`Received from ${client.id}:`, currentIteration);
-        io.to(room).emit('acknowledgement', {currentIteration, loopCount});
+        io.to(room).emit('acknowledgement', { currentIteration, loopCount });
     });
-    
-    
-    
+
+
+
     // todo :: word to find
     client.on("wordToGuess", ({ word, room }) => {
         logger.info("Guess the word");
         console.log("word is :: ", word)
         io.to(room).emit("wordToGuess", word);
     })
-    
+
     // todo :: updating points
     client.on("updatePlayerPoints", async ({ playerID, name, drawTime, room }) => {
         logger.info("Updating the points");
@@ -201,45 +195,50 @@ io.on("connection", (client) => {
         io.to(room).emit("updatePlayerList", Array.from(players));
     })
     // todo :: game over result declare
-    client.on("gameOver", ({room})=>{
+    client.on("gameOver", ({ room }) => {
         console.log("game over");
         io.to(room).emit("gameOver");
     })
 
     // todo : hide scoreCard
-    client.on("hideScoreCard", ({room})=>{
+    client.on("hideScoreCard", ({ room }) => {
         console.log("hiding the scorecard")
         io.to(room).emit("hideScoreCard");
     })
 
 
     // todo :: client reloaded, moved back, closed the page
-    client.on("userDisconnected", ({ room, playerID }) => {
-        const players = rooms.get(room);
-    
-        if (!players) return;
-    
-        // Remove the player from the Set in the room
-        let playerFound = false;
-        for (const player of players) {
-            if (player.socketID === playerID) {
-                players.delete(player); 
-                console.log("player found and removed");
-                playerFound = true;
+    client.on("disconnect", async () => {
+        console.log("user disconnected ::", client.id);
+        activeUsersGauge.dec();
+
+        const room = playerToRoom.get(client.id);
+        if(!room) return;
+
+        console.log("room is :: " , room);
+
+        const playersInRoom = rooms.get(room);
+        if(!playerToRoom) return;
+
+        // todo :: remove the player from the room
+        for(player of playersInRoom){
+            console.log(" : " , player.socketID, " - ", client.id)
+            if(player.socketID == client.id){
+                playersInRoom.delete(player);
                 break;
-            }
+            } 
         }
-    
-        if (playerFound) {
-            if (players.size === 0) {
-                rooms.delete(room);
-                console.log(`Room ${room} has no players left. Room removed from Map.`);
-            } else {
-                io.to(room).emit("updatePlayerList", Array.from(players));
-            }
+
+        // todo :: remove the room, if empty
+        if(playerToRoom.size == 0){
+            rooms.delete(room);
         }
+        else{ 
+            io.to(room).emit("updatePlayerList", Array.from(playersInRoom));
+        }
+
     });
-    
+
 
 });
 

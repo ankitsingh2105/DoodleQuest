@@ -11,6 +11,7 @@ import InfoBar from '../InfoBar/InfoBar';
 import { toast } from 'react-toastify';
 import backendLink from '@/backendlink.js';
 import websocket from './socket.js';
+import { VolumeX, Volume2 } from 'lucide-react';
 
 export default function Main() {
     const [searchParams] = useSearchParams();
@@ -26,14 +27,20 @@ export default function Main() {
     const strokeSizeRef = useRef(null);
     const [strokeSize, setStrokeSize] = useState(5);
     const [disableCanvas, setDisableCanvas] = useState(false);
+    const [volumeToggle, setVolumeToggle] = useState(false);
 
     const playerIDRef = useRef(null); // todo :: to prevent the stale value and prevent wrong updates
     const finalScorecard = useRef(null); // todo : scoreCard hidden;
     const navigate = useNavigate();
+    const backgroundMusic = useRef(null);
+
 
     useEffect(() => {
         toast.success("This service is running on a free tier, might take some time to load", { autoClose: 1500 });
         console.log('%c⚡WELCOME⚡', 'font-size: 32px; color: LIGHTGREEN; font-weight: bold;');
+        backgroundMusic.current = new Audio('/backgroundMusic.mp3');
+        backgroundMusic.current.loop = true;
+        backgroundMusic.current.volume = 0.5;
 
     }, [])
 
@@ -192,7 +199,7 @@ export default function Main() {
         throttledEmitDraw(offsetX, offsetY, color, strokeSize);
     };
 
-    //todo :: Each mouse movement sends a request via WebSocket. To limit how often requests are sent, I used the throttle function.
+    //todo :: Each mouse movement sends a request via WebSocket. too limit how often requests are sent, I used the throttle function.
 
     // used throttling, and closure
     const throttledEmitDraw = throttle(function (offsetX, offsetY, color, strokeSize) {
@@ -234,12 +241,34 @@ export default function Main() {
         '#6B7280',
         '#000000',
     ];
+    const handleToggle = () => {
+        if (volumeToggle) {
+            backgroundMusic.current.pause();
+        } else {
+            backgroundMusic.current.play();
+        }
+        setVolumeToggle(!volumeToggle);
+    };
 
 
     return (
         <>
-            <main style={{
-            }} className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6 space-y-6">
+            <main className="flex flex-col items-center justify-center bg-gray-100 space-y-6" style={{
+                transform: "scale(0.9)",
+                transformOrigin: "top left",
+                width: "111.11%",
+            }}>
+
+                {/* background music  */}
+                <section className="fixed bottom-20 right-20 z-50 rounded-4xl bg-green-500 p-2 hover:cursor-pointer">
+                    {
+                        volumeToggle ?
+                            <Volume2 color="white" onClick={ handleToggle } size={45} />
+                            :
+                            <VolumeX color="white" onClick={ handleToggle } size={45} />
+                    }
+                </section>
+
 
                 {/* Result */}
                 <center>

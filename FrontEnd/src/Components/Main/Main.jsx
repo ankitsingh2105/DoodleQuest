@@ -170,7 +170,7 @@ export default function Main() {
         contextRef.current.moveTo(offsetX, offsetY);
         contextRef.current.lineWidth = strokeSize;
         contextRef.current.strokeStyle = color;
-        socket.current.emit("beginPath", { room, offsetX, offsetY, strokeSize });
+        socket.current.emit("beginPath", { room, strokeSize });
         setIsDrawing(true);
     };
 

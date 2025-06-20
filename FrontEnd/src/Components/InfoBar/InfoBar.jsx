@@ -84,9 +84,7 @@ export default function InfoBar(props) {
   const StartGame = async () => {
     setInputDisable(false);
     setDisableCanvas(false);
-    // questions.current.style.display = "flex";
     let loopCount = player.length;
-    // console.log("number of players:: ", loopCount);
     if (loopCount == 1) {
       toast.error("Waiting for other players!", { autoClose: 1000 });
       return;
@@ -140,6 +138,7 @@ export default function InfoBar(props) {
     });
     socket.on("gameOver", () => {
       setStartDisable(false);
+      whoDrawingNow.current.style.display = "none";
     })
     return () => {
       socket.off('updatePlayerPoints');

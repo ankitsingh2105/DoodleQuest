@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import "./Join.css"
 import "./Join.css";
-import {ToastContainer, toast} from "react-toastify"
+import { ToastContainer, toast } from "react-toastify"
 
 const Home = () => {
     const navigate = useNavigate();
@@ -12,12 +12,12 @@ const Home = () => {
         const roomId = document.getElementById('roomId').value;
 
         if (!playerName) {
-            toast.error('Please enter your name to join a room!', {autoClose : 1000});
+            toast.error('Please enter your name to join a room!', { autoClose: 1000 });
             return;
         }
 
         if (!roomId) {
-            toast.error('Please enter a room ID to join!', {autoClose : 1000});
+            toast.error('Please enter a room ID to join!', { autoClose: 1000 });
             return;
         }
         navigate(`/room?roomID=${room}&name=${userName}`)
@@ -37,8 +37,12 @@ const Home = () => {
     };
 
     return (
-        <div className="font-['Fredoka'] bg-[#f0f9ff] relative overflow-hidden">
-            <ToastContainer/>
+        <div style={{
+            transform: "scale(0.9)",
+            transformOrigin: "top left",
+            width: "111.11%",
+        }} className="font-['Fredoka'] bg-[#f0f9ff] relative overflow-hidden">
+            <ToastContainer />
             {/* Navigation */}
             <nav className="bg-white bg-opacity-90 backdrop-blur-sm shadow-md py-4 px-6 sticky top-0 z-50">
                 <div className="container mx-auto flex justify-between items-center">
@@ -49,7 +53,7 @@ const Home = () => {
                         <h1 className="text-5xl font-bold text-indigo-600">DoodleQuest</h1>
                     </div>
                     <div>
-                        <a  className="text-2xl font-bold text-pink-500" href="http://ankitsinghchauhan.in">Web App by Ankit Chauhan</a>
+                        <a className="text-2xl font-bold text-pink-500" href="http://ankitsinghchauhan.in">Web App by Ankit Chauhan</a>
                     </div>
                 </div>
             </nav>
@@ -79,12 +83,12 @@ const Home = () => {
                                     <input onChange={(event) => setroom(event.target.value)} type="text" id="roomId" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter room ID" />
                                 </div>
                                 <div className="flex gap-4">
-                                    <button onKeyDown={(e)=>{
+                                    <button onKeyDown={(e) => {
                                         if (e.key === "Enter") {
                                             navigate(navLink)
                                         }
-                                    }} 
-                                    onClick={handleJoinRoom} className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition shadow-md">
+                                    }}
+                                        onClick={handleJoinRoom} className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition shadow-md">
                                         <Link style={{
                                             textDecoration: "none",
                                             color: "white",

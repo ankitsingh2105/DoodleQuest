@@ -87,72 +87,92 @@ app.get("/metrics", async (req, res) => {
     res.end(await register.metrics());
 });
 
+
 const roomManager = new RoomManager();
 const chatManager = new ChatManager(io, logger);
+
+app.get("/allRooms", (req, response) => {
+    console.log(roomManager.showRooms());
+    return response.json({ allRooms: roomManager.showRooms() });
+})
+
 roomManager.setIO(io);
 roomManager.setLogger(logger);
 roomManager.setActiveRoomsGauge(activeRooms);
 
-io.on("connection", (client) => {
-    logger.info(`New user connected: ${client.id}`);
+io.on("connection", (socket) => {
+    logger.info(`New user connected: ${socket.id}`);
     activeUsersGauge.inc();
 
-    client.on("join-room", (info) => {
-        roomManager.joinRoom(client, info);
+    socket.on("join-room", (info) => {
+        console.log("new user ::", info)
+        roomManager.joinRoom(socket, info);
     });
 
-    client.on("draw", ({ room, offsetX, offsetY, color, strokeSize }) => {
+    socket.on("draw", ({ room, offsetX, offsetY, color, strokeSize }) => {
         logger.info("Draw event: Drawing");
-        io.to(room).emit("draw", { offsetX, offsetY, color, socketID: client.id, strokeSize });
+        io.to(room).emit("draw", { offsetX, offsetY, color, socketID: socket.id, strokeSize });
     });
 
-    client.on("stopDrawing", (room) => {
+    socket.on("stopDrawing", (room) => {
         logger.info("Draw event: Stop drawing");
-        io.to(room).emit("stopDrawing", { room, playerID: client.id });
+        io.to(room).emit("stopDrawing", { room, playerID: socket.id });
     });
 
-    client.on("clear", ({ room, width, height }) => {
+    socket.on("clear", ({ room, width, height }) => {
         logger.info("Draw event: Clear canvas");
         io.to(room).emit("clear", { width, height });
     });
 
-    client.on("beginPath", ({ room, offsetX, offsetY, strokeSize }) => {
+    socket.on("beginPath", ({ room, offsetX, offsetY, strokeSize }) => {
         logger.info("Draw event: Begin path");
-        client.to(room).emit("beginPath", { offsetX, offsetY, socketID: client.id, strokeSize });
+        socket.to(room).emit("beginPath", { offsetX, offsetY, socketID: socket.id, strokeSize });
     });
 
-    client.on("sendMessage", (info) => {
+    socket.on("sendMessage", (info) => {
         chatManager.sendMessage(info);
     });
 
-    client.on("myEvent", ({ currentIteration, room, loopCount }) => {
-        logger.info(`Received myEvent from ${client.id}: ${currentIteration}`);
-        io.to(room).emit("acknowledgement", { currentIteration, loopCount });
+    socket.on("myEvent", ({ currentIteration, room, loopCount, customDrawTime, difficulty }) => {
+        logger.info(`Received myEvent from ${socket.id}: ${currentIteration}`);
+        io.to(room).emit("acknowledgement", { currentIteration, loopCount, customDrawTime, difficulty }); 
     });
 
-    client.on("wordToGuess", ({ word, room }) => {
+    socket.on("wordToGuess", ({ word, room }) => {
         logger.info("Guess the word event");
         io.to(room).emit("wordToGuess", word);
     });
 
-    client.on("updatePlayerPoints", (info) => {
+    socket.on("updatePlayerPoints", (info) => {
         roomManager.updatePlayerPoints(info);
     });
 
-    client.on("gameOver", ({ room }) => {
+    socket.on("gameOver", ({ room }) => {
         logger.info("Game over event");
         io.to(room).emit("gameOver");
     });
 
-    client.on("hideScoreCard", ({ room }) => {
+    socket.on("hideScoreCard", ({ room }) => {
         logger.info("Hide scorecard event");
         io.to(room).emit("hideScoreCard");
     });
 
-    client.on("disconnect", () => {
-        logger.info(`User disconnected: ${client.id}`);
+    socket.on("kickUser", ({ room, socketID: targetSocketID }) => {
+        const players = roomManager.rooms.get(room);
+        if (!players) return;
+
+        const admin = [...players].find(p => p.socketID === socket.id && p.role === "admin");
+        if (admin && typeof admin.kickUser === "function") {
+            admin.kickUser(targetSocketID, roomManager.rooms, room);
+        } else {
+            console.warn(`not allowed ${socket.id}`);
+        }
+    });
+
+    socket.on("disconnect", () => {
+        logger.info(`User disconnected: ${socket.id}`);
         activeUsersGauge.dec();
-        roomManager.removePlayer(client.id);
+        roomManager.removePlayer(socket.id);
     });
 });
 

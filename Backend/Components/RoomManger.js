@@ -1,4 +1,5 @@
 const Player = require("./Player");
+const AdminPlayer = require("./AdminPlayers");
 
 class RoomManager {
     constructor() {
@@ -10,71 +11,106 @@ class RoomManager {
     }
 
     setIO(io) {
-        this.io = io;
+        try {
+            this.io = io;
+        } catch (error) {
+            console.error(`Error setting IO: ${error.message}`);
+        }
     }
 
     setLogger(logger) {
-        this.logger = logger;
+        try {
+            this.logger = logger;
+        } catch (error) {
+            console.error(`Error setting logger: ${error.message}`);
+        }
     }
 
     setActiveRoomsGauge(activeRoomsGauge) {
-        this.activeRoomsGauge = activeRoomsGauge;
+        try {
+            this.activeRoomsGauge = activeRoomsGauge;
+        } catch (error) {
+            console.error(`Error setting activeRoomsGauge: ${error.message}`);
+        }
     }
 
-    joinRoom(client, { room, name }) {
-        this.logger.info(`User ${client.id} joined room: ${room}`);
-        this.playerToRoom.set(client.id, room);
-
-        if (!this.rooms.has(room)) {
-            this.rooms.set(room, new Set());
-            this.activeRoomsGauge.inc();
+    showRooms() {
+        try {
+            let allRooms = [];
+            for (let [room, roomData] of this.rooms.entries()) {
+                allRooms.push(room);
+            }
+            console.log("my rooms :: " , allRooms);
+            return allRooms;
+        } catch (error) {
+            console.error(`Error in showRooms: ${error.message}`);
+            return [];
         }
+    }
 
-        const newPlayer = new Player(client.id, name);
-        this.rooms.get(room).add(newPlayer);
+    joinRoom(socket, { room, name, role }) {
+        try {
+            this.playerToRoom.set(socket.id, room);
+            if (!this.rooms.has(room)) {
+                this.rooms.set(room, new Set());
+                this.activeRoomsGauge?.inc();
+            }
 
-        client.join(room);
-        this.io.to(room).emit("updatePlayerList", Array.from(this.rooms.get(room)).map(p => p.toJSON()));
-        this.io.to(room).emit("newPlayer", { room, name, playerSocketID: client.id });
+            const PlayerClass = role === "admin" ? AdminPlayer : Player;
+            const newPlayer = new PlayerClass(socket, this.io, socket.id, name, room, role);
+            this.rooms.get(room).add(newPlayer);
+            newPlayer.newPlayerJoin(this.rooms);
+        } catch (error) {
+            console.error(`Error in joinRoom for ${socket?.id}: ${error.message}`);
+        }
     }
 
     updatePlayerPoints({ playerID, name, drawTime, room }) {
-        this.logger.info("Updating player points");
-        const players = this.rooms.get(room);
-        if (!players) return;
+        try {
+            if (!playerID || !room || drawTime == null) throw new Error("Missing required parameters");
+            const players = this.rooms.get(room);
+            if (!players) throw new Error(`Room ${room} not found`);
 
-        for (let player of players) {
-            if (player.socketID === playerID) {
-                player.updatePoints(drawTime);
-                break;
+            for (let player of players) {
+                if (player.socketID === playerID) {
+                    player.updatePoints(drawTime);
+                    break;
+                }
             }
-        }
 
-        this.io.to(room).emit("updatePlayerList", Array.from(players).map(p => p.toJSON()));
+            this.io.to(room).emit("updatePlayerList", Array.from(players).map(p => p.toJSON()));
+        } catch (error) {
+            console.error(`Error in updatePlayerPoints for ${playerID}: ${error.message}`);
+        }
     }
 
     removePlayer(clientId) {
-        const room = this.playerToRoom.get(clientId);
-        if (!room) return;
+        try {
+            if (!clientId) throw new Error("Invalid clientId");
+            const room = this.playerToRoom.get(clientId);
+            if (!room) return;
 
-        const playersInRoom = this.rooms.get(room);
-        if (!playersInRoom) return;
+            const playersInRoom = this.rooms.get(room);
+            if (!playersInRoom) return;
 
-        for (let player of playersInRoom) {
-            if (player.socketID === clientId) {
-                playersInRoom.delete(player);
-                break;
+            for (let player of playersInRoom) {
+                if (player.socketID === clientId) {
+                    playersInRoom.delete(player);
+                    break;
+                }
             }
-        }
 
-        if (playersInRoom.size === 0) {
-            this.rooms.delete(room);
-            this.activeRoomsGauge.dec();
-        } else {
-            this.io.to(room).emit("updatePlayerList", Array.from(playersInRoom).map(p => p.toJSON()));
-        }
+            if (playersInRoom.size === 0) {
+                this.rooms.delete(room);
+                this.activeRoomsGauge.dec();
+            } else {
+                this.io.to(room).emit("updatePlayerList", Array.from(playersInRoom).map(p => p.toJSON()));
+            }
 
-        this.playerToRoom.delete(clientId);
+            this.playerToRoom.delete(clientId);
+        } catch (error) {
+            console.error(`Error in removePlayer for ${clientId}: ${error.message}`);
+        }
     }
 }
 

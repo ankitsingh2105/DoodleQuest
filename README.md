@@ -5,10 +5,10 @@ A multiplayer online drawing and guessing game inspired by Scribble. It allows u
 
 ## Game Images
 - Home, Admin Player, Regular Player, Game Start, Select words
-<img width="465" height="320" alt="dd1" src="https://github.com/user-attachments/assets/1de2f7cd-6b5b-4793-9f52-a7a9141ed797" />
-<img width="465" height="320" alt="dd2" src="https://github.com/user-attachments/assets/c1c5de8c-5643-4cba-a098-7eef392c439f" />
-<img width="465" height="320" alt="dd3" src="https://github.com/user-attachments/assets/7371c685-192c-43c9-a340-7349fa05e793" />
-<img width="465" height="320" alt="dd4" src="https://github.com/user-attachments/assets/3accf979-a0bf-49aa-bf83-9c83408342ed" />
+<img width="485" height="340" alt="dd1" src="https://github.com/user-attachments/assets/1de2f7cd-6b5b-4793-9f52-a7a9141ed797" />
+<img width="485" height="340" alt="dd2" src="https://github.com/user-attachments/assets/c1c5de8c-5643-4cba-a098-7eef392c439f" />
+<img width="485" height="340" alt="dd3" src="https://github.com/user-attachments/assets/7371c685-192c-43c9-a340-7349fa05e793" />
+<img width="485" height="340" alt="dd4" src="https://github.com/user-attachments/assets/3accf979-a0bf-49aa-bf83-9c83408342ed" />
 
 
 ## Features

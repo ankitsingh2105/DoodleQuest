@@ -2,11 +2,24 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import "./Join.css"
 import "./Join.css";
+import axios from "axios";
 import { ToastContainer, toast } from "react-toastify"
+import backendLink from '../../../backendlink';
 
 const Home = () => {
     const navigate = useNavigate();
     const [navLink, setNavLink] = useState("/");
+    const [allRoomData, setAllRoomData] = useState([]);
+
+    useEffect(() => {
+        const getAllRoom = async () => {
+            let rooms = await axios.get(`${backendLink}/allRooms`);
+            setAllRoomData(rooms.data.allRooms);
+        }
+        getAllRoom();
+    }, [])
+
+
     const handleJoinRoom = () => {
         const playerName = document.getElementById('playerName').value;
         const roomId = document.getElementById('roomId').value;
@@ -20,6 +33,31 @@ const Home = () => {
             toast.error('Please enter a room ID to join!', { autoClose: 1000 });
             return;
         }
+        if (!allRoomData.includes(room)) {
+            toast.error("No such rooms exist, plase create one", { autoClose: 1500 });
+            return;
+        }
+        sessionStorage.setItem("role", "regular");
+        navigate(`/room?roomID=${room}&name=${userName}`)
+    };
+    const handleCreateRoom = async () => {
+        const roomId = document.getElementById('roomId').value;
+
+        if (!playerName) {
+            toast.error('Please enter your name to join a room!', { autoClose: 1000 });
+            return;
+        }
+
+        if (!roomId) {
+            toast.error('Please enter a room ID to join!', { autoClose: 1000 });
+            return;
+        }
+
+        if (allRoomData.includes(room)) {
+            toast.error("Room already exists", { autoClose: 1500 });
+            return;
+        }
+        sessionStorage.setItem("role", "admin");
         navigate(`/room?roomID=${room}&name=${userName}`)
     };
 
@@ -94,6 +132,18 @@ const Home = () => {
                                             color: "white",
                                             fontFamily: "Courier New', Courier, monospace"
                                         }} to={navLink} >Join Room</Link>
+                                    </button>
+                                    <button onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            navigate(navLink)
+                                        }
+                                    }}
+                                        onClick={handleCreateRoom} className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition shadow-md">
+                                        <Link style={{
+                                            textDecoration: "none",
+                                            color: "white",
+                                            fontFamily: "Courier New', Courier, monospace"
+                                        }} to={navLink} >Create Room</Link>
                                     </button>
                                 </div>
                             </div>

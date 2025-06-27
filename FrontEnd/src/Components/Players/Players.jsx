@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import { LogOut } from 'lucide-react';
 
-export default function Players({ playerList }) {
+export default function Players({ playerList, socket }) {
   const emojis = [
     "🤭", "🥴", "🥴", "🤩", "🧐", "😅", "😂", "🤣", "😊", "😇",
     "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚",
@@ -12,6 +12,12 @@ export default function Players({ playerList }) {
     "👹", "👺", "🤡", "💩", "👻", "💀", "☠️", "👽", "👾", "🤖",
     "🎃", "😺", "😸", "😹", "😻", "😼", "😽", "🙀", "😿", "😾"
   ];
+
+  const role = sessionStorage.getItem('role');
+
+  const kickPlayer = (room, socketID) => {
+    socket.emit("kickUser", ({ room, socketID }))
+  }
 
   return (
     <div className="flex flex-col h-full border-4 rounded-2xl border-dashed border-pink-400  shadow-md bg-white">
@@ -26,19 +32,28 @@ export default function Players({ playerList }) {
         {[...playerList].sort((a, b) => b.points - a.points).map((player, index) => (
           <div
             key={index}
-            className={`p-4 rounded-md text-center ${
-              index % 2 === 0 ? 'bg-gray-100' : 'bg-green-100'
-            }`}
+            className={`p-4 rounded-md text-center ${index % 2 === 0 ? 'bg-gray-100' : 'bg-green-100'
+              }`}
           >
             <div className="text-lg font-semibold">
               {player.name} {emojis[index]}
+              <div className="text-sm text-green-500">
+                {
+                  player.role === "admin" ? <b>{player.role} </b> : <></>
+                }
+              </div>
             </div>
             <div className="text-sm text-gray-700">
               Points: <b>{player.points}</b>
             </div>
-            <div className="text-xs text-gray-500">
-              Position: {index + 1}
-            </div>
+            <center onClick={() => kickPlayer(player.room, player.socketID)} className={`text-sm text-gray-700 ${role !== "admin" ? "hidden" : ""} hover:cursor-pointer`}>
+              {
+                player.role === "admin" ? <>
+                </>
+                  :
+                  <LogOut />
+              }
+            </center>
           </div>
         ))}
       </div>

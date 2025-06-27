@@ -36,7 +36,7 @@ export default function Main() {
 
 
     useEffect(() => {
-        toast.success("This service is running on a free tier, might take some time to load", { autoClose: 1500 });
+        toast.success("This service is running on a free tier, might take some time to load", { autoClose: 4000 });
         console.log('%c⚡WELCOME⚡', 'font-size: 32px; color: LIGHTGREEN; font-weight: bold;');
         backgroundMusic.current = new Audio('/backgroundMusic.mp3');
         backgroundMusic.current.loop = true;
@@ -44,11 +44,12 @@ export default function Main() {
 
     }, [])
 
+    let role = sessionStorage.getItem("role");
     useEffect(() => {
         if (!socket.current.connected) {
             socket.current.connect();
         }
-        socket.current.emit("join-room", { room, name });
+        socket.current.emit("join-room", { room, name, role });
     }, [room, socket]);
 
     useEffect(() => {
@@ -59,6 +60,24 @@ export default function Main() {
             }
         };
     }, []);
+
+
+    const kickUserInFiveSeconds = () => {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, 2000);
+        })
+    }
+
+    const handleKickedUser = async ({targetSocketID}) => {
+        if (targetSocketID !== playerIDRef.current) {
+            return;
+        }
+        toast.info("You will be removed by the admin in 2 second", { autoClose: 2000 });
+        await kickUserInFiveSeconds();
+        navigate("/");
+    }
 
 
     useEffect(() => {
@@ -90,7 +109,6 @@ export default function Main() {
                 return;
             }
             const context = contextRef.current;
-            // console.log("player id on socket is ", playerID);
             context.beginPath();
             context.lineWidth = strokeSize;
         };
@@ -129,6 +147,7 @@ export default function Main() {
         socket.current.on("stopDrawing", handleStopDrawing);
         socket.current.on("beginPath", handleBeginPath);
         socket.current.on("updatePlayerList", handleUpdatePlayerList);
+        socket.current.on("kicked", handleKickedUser);
 
         return () => {
             socket.current.off("newPlayer");
@@ -137,6 +156,7 @@ export default function Main() {
             socket.current.off("stopDrawing", handleStopDrawing);
             socket.current.off("beginPath", handleBeginPath);
             socket.current.off("updatePlayerList", handleUpdatePlayerList);
+            socket.current.off("kicked", handleKickedUser);
 
         };
     }, [socket]);
@@ -262,9 +282,9 @@ export default function Main() {
                 <section className="fixed bottom-20 right-20 z-50 rounded-4xl bg-green-500 p-2 hover:cursor-pointer">
                     {
                         volumeToggle ?
-                            <Volume2 color="white" onClick={ handleToggle } size={45} />
+                            <Volume2 color="white" onClick={handleToggle} size={45} />
                             :
-                            <VolumeX color="white" onClick={ handleToggle } size={45} />
+                            <VolumeX color="white" onClick={handleToggle} size={45} />
                     }
                 </section>
 
@@ -293,7 +313,7 @@ export default function Main() {
 
 
                 {/* InfoBar */}
-                <section className="w-full max-w-6xl bg-white rounded-2xl shadow-lg p-4">
+                <section className={`w-full max-w-6xl rounded-2xl shadow-lg p-4`}>
                     <InfoBar setDisableCanvas={setDisableCanvas} playerID={playerID} setplayer={setplayers} player={players} name={name} room={room} socket={socket.current} />
                 </section>
 
@@ -302,7 +322,7 @@ export default function Main() {
 
                     {/* Player List */}
                     <section className="flex-1 bg-white rounded-2xl shadow-lg p-4">
-                        <Players name={name} room={room} socket={socket} playerList={players} />
+                        <Players name={name} room={room} socket={socket.current} playerList={players} />
                     </section>
 
 

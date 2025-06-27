@@ -95,7 +95,7 @@ const Home = () => {
                         <h1 className="text-5xl font-bold text-indigo-600">DoodleQuest</h1>
                     </div>
                     <div>
-                        <a className="text-2xl font-bold text-pink-500" href="http://ankitsinghchauhan.in">Web App by Ankit Chauhan</a>
+                        <a className="text-2xl font-bold text-pink-500" href="http://ankitsinghchauhan.in">Game by Ankit Chauhan</a>
                     </div>
                 </div>
             </nav>

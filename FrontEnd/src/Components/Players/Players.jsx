@@ -1,6 +1,6 @@
 import { LogOut } from 'lucide-react';
 
-export default function Players({ playerList, socket }) {
+export default function Players({ room, playerList, socket }) {
   const emojis = [
     "🤭", "🥴", "🥴", "🤩", "🧐", "😅", "😂", "🤣", "😊", "😇",
     "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚",
@@ -14,9 +14,10 @@ export default function Players({ playerList, socket }) {
   ];
 
   const role = sessionStorage.getItem('role');
-
+  console.log(playerList)
   const kickPlayer = (room, socketID) => {
-    socket.emit("kickUser", ({ room, socketID }))
+    socket.emit("kickUser", ({ room, socketID }));
+    console.log("emitted");
   }
 
   return (
@@ -46,7 +47,7 @@ export default function Players({ playerList, socket }) {
             <div className="text-sm text-gray-700">
               Points: <b>{player.points}</b>
             </div>
-            <center onClick={() => kickPlayer(player.room, player.socketID)} className={`text-sm text-gray-700 ${role !== "admin" ? "hidden" : ""} hover:cursor-pointer`}>
+            <center onClick={() => kickPlayer(room, player.socketID)} className={`text-sm text-gray-700 ${role !== "admin" ? "hidden" : ""} hover:cursor-pointer`}>
               {
                 player.role === "admin" ? <>
                 </>

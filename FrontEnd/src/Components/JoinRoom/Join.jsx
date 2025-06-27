@@ -9,18 +9,9 @@ import backendLink from '../../../backendlink';
 const Home = () => {
     const navigate = useNavigate();
     const [navLink, setNavLink] = useState("/");
-    const [allRoomData, setAllRoomData] = useState([]);
-
-    useEffect(() => {
-        const getAllRoom = async () => {
-            let rooms = await axios.get(`${backendLink}/allRooms`);
-            setAllRoomData(rooms.data.allRooms);
-        }
-        getAllRoom();
-    }, [])
 
 
-    const handleJoinRoom = () => {
+    const handleJoinRoom = async () => {
         const playerName = document.getElementById('playerName').value;
         const roomId = document.getElementById('roomId').value;
 
@@ -33,6 +24,11 @@ const Home = () => {
             toast.error('Please enter a room ID to join!', { autoClose: 1000 });
             return;
         }
+
+        let rooms = await axios.get(`${backendLink}/allRooms`);
+
+        let allRoomData = rooms.data.allRooms;
+
         if (!allRoomData.includes(room)) {
             toast.error("No such rooms exist, plase create one", { autoClose: 1500 });
             return;
@@ -52,6 +48,10 @@ const Home = () => {
             toast.error('Please enter a room ID to join!', { autoClose: 1000 });
             return;
         }
+
+        let rooms = await axios.get(`${backendLink}/allRooms`);
+
+        let allRoomData = rooms.data.allRooms;
 
         if (allRoomData.includes(room)) {
             toast.error("Room already exists", { autoClose: 1500 });
@@ -80,7 +80,11 @@ const Home = () => {
             transformOrigin: "top left",
             width: "111.11%",
         }} className="font-['Fredoka'] bg-[#f0f9ff] relative overflow-hidden">
+
+
             <ToastContainer />
+
+
             {/* Navigation */}
             <nav className="bg-white bg-opacity-90 backdrop-blur-sm shadow-md py-4 px-6 sticky top-0 z-50">
                 <div className="container mx-auto flex justify-between items-center">
@@ -200,7 +204,7 @@ const Home = () => {
             </section>
 
             {/* Call To Action */}
-            <section className="-mb-3 py-16 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-center">
+            <section className=" py-16 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-center">
                 <div className="container mx-auto">
                     <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Show Off Your Drawing Skills?</h2>
                     <p className="text-xl mb-8 max-w-2xl mx-auto">Join thousands of players already enjoying DoodleQuest. Enter your name, create a room, and start playing now!</p>

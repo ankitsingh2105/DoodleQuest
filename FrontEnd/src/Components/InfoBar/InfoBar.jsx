@@ -152,14 +152,28 @@ export default function InfoBar(props) {
     socket.on('updatePlayerPoints', ({ players }) => {
       setplayer(players);
     });
+
     socket.on("gameOver", () => {
       setStartDisable(false);
       whoDrawingNow.current.style.display = "none";
     })
 
+    socket.on("playerGotRightAnswer", ({ name, playerID : playerWithConnectAnswer, drawTime }) => {
+      console.log(playerWithConnectAnswer);
+      if (playerID === playerWithConnectAnswer){
+        toast.success(`You got the right answer in ${drawTime}`, {autoClose : 2000});
+        correct_answer.play();
+      }
+      else{
+        toast.success(`${name} got the right answer in ${drawTime}`, {autoClose : 2000});
+        correct_answer.play();
+      }
+    })
+
     return () => {
       socket.off('updatePlayerPoints');
       socket.off('gameOver');
+      socket.off("playerGotRightAnswer")
     }
   }, [socket]);
 
@@ -234,7 +248,7 @@ export default function InfoBar(props) {
               type="text"
               placeholder="in seconds"
               onChange={handleTimeSubmit}
-              className="w-25 p-2 border rounded-md font-normal"
+              className="w-25 p-2 border rounded-md font-normal bg-white"
             />
           </div>
         </section>
@@ -246,7 +260,7 @@ export default function InfoBar(props) {
           <select
             value={difficulty}
             onChange={handleDifficultyChange}
-            className="p-2 border rounded-md font-normal"
+            className="p-2 border rounded-md font-normal bg-white"
           >
             <option value="Easy">Easy</option>
             <option value="Medium">Medium</option>

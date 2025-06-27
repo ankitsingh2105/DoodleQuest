@@ -70,7 +70,7 @@ export default function Main() {
         })
     }
 
-    const handleKickedUser = async ({targetSocketID}) => {
+    const handleKickedUser = async ({ targetSocketID }) => {
         if (targetSocketID !== playerIDRef.current) {
             return;
         }
@@ -313,7 +313,7 @@ export default function Main() {
 
 
                 {/* InfoBar */}
-                <section className={`w-full max-w-6xl rounded-2xl shadow-lg p-4`}>
+                <section className={`w-full max-w-6xl bg-white rounded-2xl shadow-lg p-4`}>
                     <InfoBar setDisableCanvas={setDisableCanvas} playerID={playerID} setplayer={setplayers} player={players} name={name} room={room} socket={socket.current} />
                 </section>
 
@@ -383,6 +383,25 @@ export default function Main() {
                     </section>
 
                 </section>
+
+                {/* admin privlages list */}
+                <section className='pb-3'>
+                    {
+                        role == "admin" ? 
+                        <>
+                            <b className='flex justify-center text-3xl' >Admin Privlages</b>
+                            <ul>
+                                <li className='p-2'>1. Admin can kick the player using the button below the player's name</li>
+                                <li className='p-2'>2. Admin can set the draw duration</li>
+                                <li className='p-2'>3. Admin can set the difficulty</li>
+                            </ul>
+                        </>
+                        :
+                        <>
+                        </>
+                    }
+                </section>
+
             </main>
 
         </>

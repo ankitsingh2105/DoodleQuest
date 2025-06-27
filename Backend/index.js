@@ -135,7 +135,7 @@ io.on("connection", (socket) => {
 
     socket.on("myEvent", ({ currentIteration, room, loopCount, customDrawTime, difficulty }) => {
         logger.info(`Received myEvent from ${socket.id}: ${currentIteration}`);
-        io.to(room).emit("acknowledgement", { currentIteration, loopCount, customDrawTime, difficulty }); 
+        io.to(room).emit("acknowledgement", { currentIteration, loopCount, customDrawTime, difficulty });
     });
 
     socket.on("wordToGuess", ({ word, room }) => {
@@ -145,6 +145,8 @@ io.on("connection", (socket) => {
 
     socket.on("updatePlayerPoints", (info) => {
         roomManager.updatePlayerPoints(info);
+        const { name, drawTime, room, playerID } = info
+        io.to(room).emit("playerGotRightAnswer", { name, playerID, drawTime })
     });
 
     socket.on("gameOver", ({ room }) => {

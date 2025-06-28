@@ -128,7 +128,6 @@ export default function InfoBar(props) {
     if (e.key === 'Enter') {
       if (item === answer) {
         correct_answer.play();
-        toast.success("Right Answer, points updated", { autoClose: 1000 });
         socket.emit("updatePlayerPoints", { name, drawTime, room, playerID });
         setInputDisable(true);
       }
@@ -158,14 +157,14 @@ export default function InfoBar(props) {
       whoDrawingNow.current.style.display = "none";
     })
 
-    socket.on("playerGotRightAnswer", ({ name, playerID : playerWithConnectAnswer, drawTime }) => {
+    socket.on("playerGotRightAnswer", ({ name, playerID: playerWithConnectAnswer, drawTime }) => {
       console.log(playerWithConnectAnswer);
-      if (playerID === playerWithConnectAnswer){
-        toast.success(`You got the right answer in ${drawTime}`, {autoClose : 2000});
+      if (playerID === playerWithConnectAnswer) {
+        toast.success(`You got the right answer in ${drawTime}`, { autoClose: 2000 });
         correct_answer.play();
       }
-      else{
-        toast.success(`${name} got the right answer in ${drawTime}`, {autoClose : 2000});
+      else {
+        toast.success(`${name} got the right answer in ${drawTime}`, { autoClose: 2000 });
         correct_answer.play();
       }
     })

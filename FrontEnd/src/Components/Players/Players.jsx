@@ -44,17 +44,27 @@ export default function Players({ room, playerList, socket }) {
                 }
               </div>
             </div>
+
             <div className="text-sm text-gray-700">
               Points: <b>{player.points}</b>
             </div>
-            <center onClick={() => kickPlayer(room, player.socketID)} className={`text-sm text-gray-700 ${role !== "admin" ? "hidden" : ""} hover:cursor-pointer`}>
+
+            <center
+              onClick={() => kickPlayer(room, player.socketID)}
+              className={`relative text-sm text-gray-700 ${role !== "admin" ? "hidden" : ""} hover:cursor-pointer group`}
+            >
               {
-                player.role === "admin" ? <>
-                </>
-                  :
-                  <LogOut />
+                player.role === "admin" ? null : (
+                  <div className="relative flex items-center justify-center">
+                    <LogOut color="#FF474D" strokeWidth={4} />
+                    <span className="absolute -top-6 scale-0 group-hover:scale-100 transition-transform text-xs bg-gray-800 text-white px-2 py-1 rounded">
+                      Kickout user
+                    </span>
+                  </div>
+                )
               }
             </center>
+
           </div>
         ))}
       </div>

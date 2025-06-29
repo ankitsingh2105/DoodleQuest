@@ -87,6 +87,15 @@ app.get("/metrics", async (req, res) => {
     res.end(await register.metrics());
 });
 
+process.on("uncaughtException", (err) => {
+    console.error("🔥 Uncaught Exception:", err.stack || err);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+    console.error("🔥 Unhandled Rejection at:", promise, "reason:", reason);
+});
+
+
 
 const roomManager = new RoomManager();
 const chatManager = new ChatManager(io, logger);
@@ -133,30 +142,18 @@ io.on("connection", (socket) => {
         chatManager.sendMessage(info);
     });
 
-    socket.on("myEvent", ({ currentIteration, room, loopCount, customDrawTime, difficulty }) => {
-        logger.info(`Received myEvent from ${socket.id}: ${currentIteration}`);
-        io.to(room).emit("acknowledgement", { currentIteration, loopCount, customDrawTime, difficulty });
-    });
+    // todo :: admin privilege
+    socket.on("startGame", ({ currentIteration, room, loopCount, customDrawTime, difficulty }) => {
+        logger.info(`Received startGame from ${socket.id}: ${currentIteration}`);
+        const players = roomManager.rooms.get(room);
+        if (!players) return;
 
-    socket.on("wordToGuess", ({ word, room }) => {
-        logger.info("Guess the word event");
-        io.to(room).emit("wordToGuess", word);
-    });
-
-    socket.on("updatePlayerPoints", (info) => {
-        roomManager.updatePlayerPoints(info);
-        const { name, drawTime, room, playerID } = info
-        io.to(room).emit("playerGotRightAnswer", { name, playerID, drawTime })
-    });
-
-    socket.on("gameOver", ({ room }) => {
-        logger.info("Game over event");
-        io.to(room).emit("gameOver");
-    });
-
-    socket.on("hideScoreCard", ({ room }) => {
-        logger.info("Hide scorecard event");
-        io.to(room).emit("hideScoreCard");
+        const admin = [...players].find(p => p.socketID === socket.id && p.role === "admin");
+        if (admin && typeof admin.kickUser === "function") {
+            admin.startGame(currentIteration, room, loopCount, customDrawTime, difficulty);
+        } else {
+            console.warn(`Error in starting the game in index.js  ${socket.id}`);
+        }
     });
 
     socket.on("kickUser", ({ room, socketID: targetSocketID }) => {
@@ -170,6 +167,33 @@ io.on("connection", (socket) => {
             console.warn(`not allowed ${socket.id}`);
         }
     });
+
+    socket.on("wordToGuess", ({ word, room }) => {
+        logger.info("Guess the word event");
+        io.to(room).emit("wordToGuess", word);
+    });
+
+    socket.on("updatePlayerPoints", (info) => {
+        const { name, drawTime, room, playerID, isReady } = info
+        roomManager.updatePlayerPoints(info);
+        io.to(room).emit("playerGotRightAnswer", { name,  playerWithCorrectAnswer : playerID, drawTime })
+    });
+
+    socket.on("gameOver", ({ room }) => {
+        logger.info("Game over event");
+        io.to(room).emit("gameOver");
+    });
+
+    socket.on("hideScoreCard", ({ room }) => {
+        logger.info("Hide scorecard event");
+        io.to(room).emit("hideScoreCard");
+    });
+
+
+    socket.on("playerReady", ({ playerID, isReady, room, name }) => {
+        roomManager.updatePlayerReadyState({ playerID, isReady, room, name });
+    })
+
 
     socket.on("disconnect", () => {
         logger.info(`User disconnected: ${socket.id}`);

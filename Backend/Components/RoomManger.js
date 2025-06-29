@@ -40,7 +40,7 @@ class RoomManager {
             for (let [room, roomData] of this.rooms.entries()) {
                 allRooms.push(room);
             }
-            console.log("my rooms :: " , allRooms);
+            console.log("my rooms :: ", allRooms);
             return allRooms;
         } catch (error) {
             console.error(`Error in showRooms: ${error.message}`);
@@ -48,7 +48,8 @@ class RoomManager {
         }
     }
 
-    joinRoom(socket, { room, name, role }) {
+    joinRoom(socket, { room, name, role, ready }) {
+        console.log("in join room :: ", role, ready);
         try {
             this.playerToRoom.set(socket.id, room);
             if (!this.rooms.has(room)) {
@@ -57,7 +58,7 @@ class RoomManager {
             }
 
             const PlayerClass = role === "admin" ? AdminPlayer : Player;
-            const newPlayer = new PlayerClass(socket, this.io, socket.id, name, room, role);
+            const newPlayer = new PlayerClass(socket, this.io, socket.id, name, room, role, ready);
             this.rooms.get(room).add(newPlayer);
             newPlayer.newPlayerJoin(this.rooms);
         } catch (error) {
@@ -65,7 +66,7 @@ class RoomManager {
         }
     }
 
-    updatePlayerPoints({ playerID, name, drawTime, room }) {
+    updatePlayerPoints({ playerID, name, drawTime, room, isReady }) {
         try {
             if (!playerID || !room || drawTime == null) throw new Error("Missing required parameters");
             const players = this.rooms.get(room);
@@ -83,6 +84,37 @@ class RoomManager {
             console.error(`Error in updatePlayerPoints for ${playerID}: ${error.message}`);
         }
     }
+
+    updatePlayerReadyState({ playerID, isReady, room, name }) {
+        try {
+            console.log(playerID, isReady);
+            console.log(room);
+
+            const players = this.rooms.get(room);
+
+            if (!players || !playerID) {
+                throw new Error(`Invalid room or player ID: room=${room}, playerID=${playerID}`);
+            }
+
+            let found = false;
+
+            for (let player of players) {
+                if (player.socketID === playerID) {
+                    player.updateReadyState(players, isReady);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                throw new Error(`Player with socketID ${playerID} not found in room ${room}`);
+            }
+        }
+        catch (error) {
+            console.error("Error in updatePlayerReadyState:", error.message);
+        }
+    }
+
 
     removePlayer(clientId) {
         try {

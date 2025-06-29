@@ -23,13 +23,31 @@ class AdminPlayer extends Player {
                 }
             }
             const updatedPlayers = Array.from(players).map(p => p.toJSON());
-            console.log("updated :: ", updatedPlayers);
             this.emitUpdate(updatedPlayers);
             this.io.to(targetRoom).emit("kicked", { targetSocketID })
         } catch (error) {
             console.error(`Error in kickUser: ${error.message}`);
         }
     }
+    startGame(currentIteration, room, loopCount, customDrawTime, difficulty) {
+        try {
+            console.log(room);
+            console.log("in start game admin");
+            if (!room) {
+                throw new Error("Room ID is required to start the game.");
+            }
+
+            this.io.to(room).emit("acknowledgement", {
+                currentIteration,
+                loopCount,
+                customDrawTime,
+                difficulty
+            });
+        } catch (error) {
+            console.error(`Error in startGame for room ${room}:`, error.message);
+        }
+    }
+
 }
 
 module.exports = AdminPlayer;

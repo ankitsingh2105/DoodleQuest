@@ -1,5 +1,5 @@
 class Player {
-    constructor(socket, io, socketID, name, room, role) {
+    constructor(socket, io, socketID, name, room, role, ready) {
         this.socket = socket;
         this.io = io;
         this.socketID = socketID;
@@ -7,6 +7,7 @@ class Player {
         this.room = room;
         this.points = 0;
         this.role = role;
+        this.ready = ready;
     }
 
     newPlayerJoin(allRooms) {
@@ -15,20 +16,21 @@ class Player {
             let allPlayersInRoom = [];
             this.socket.join(this.room);
             for (let player of allRooms.get(this.room)) {
-                const { socketID, name, room, points, role } = player;
-                console.log("my role : :" , role);
-                allPlayersInRoom.push({ socketID, name, room, points, role});
+                const { socketID, name, room, points, role, ready } = player;
+                console.log("my role : :", role, ready);
+                allPlayersInRoom.push({ socketID, name, room, points, role, ready });
             }
+            console.log(" op ankit :: >> ", allPlayersInRoom);
             this.emitUpdate(allPlayersInRoom);
-            this.io.to(this.room).emit("newPlayer", { room: this.room, name: this.name, playerSocketID: this.socketID, role : this.role });
+            this.io.to(this.room).emit("newPlayer", { room: this.room, name: this.name, playerSocketID: this.socketID, role: this.role });
         } catch (error) {
             console.error(`Error in newPlayerJoin for ${this.socketID}: ${error.message}`);
-        } 
+        }
     }
 
     emitUpdate(players) {
         try {
-            console.log("players:: " , players);
+            console.log("players:: ", players);
             if (!players || !Array.isArray(players)) throw new Error("Invalid players data");
             this.io.to(this.room).emit("updatePlayerList", Array.from(players));
         } catch (error) {
@@ -45,13 +47,35 @@ class Player {
         }
     }
 
+    updateReadyState(players) {
+        try {
+            let allPlayersInRoom = [];
+
+            if (!players) {
+                throw new Error(`No players found in room: ${this.room}`);
+            }
+            console.log(this.ready);
+            this.ready = !this.ready;
+            console.log(this.ready);
+            for (let player of players) {
+                const { socketID, name, room, points, role, ready } = player;
+                allPlayersInRoom.push({ socketID, name, room, points, role, ready });
+            }
+            this.io.to(this.room).emit("updatePlayerList", Array.from(allPlayersInRoom));
+        } catch (error) {
+            console.error("Error in updateReadyState:", error.message);
+        }
+    }
+
+
     toJSON() {
         try {
             return {
                 socketID: this.socketID,
                 name: this.name,
                 points: this.points,
-                role : this.role
+                role: this.role,
+                ready : this.ready
             };
         } catch (error) {
             console.error(`Error in toJSON for ${this.socketID}: ${error.message}`);

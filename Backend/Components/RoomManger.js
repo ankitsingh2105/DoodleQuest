@@ -40,7 +40,6 @@ class RoomManager {
             for (let [room, roomData] of this.rooms.entries()) {
                 allRooms.push(room);
             }
-            console.log("my rooms :: ", allRooms);
             return allRooms;
         } catch (error) {
             console.error(`Error in showRooms: ${error.message}`);
@@ -87,8 +86,6 @@ class RoomManager {
 
     updatePlayerReadyState({ playerID, isReady, room, name }) {
         try {
-            console.log(playerID, isReady);
-            console.log(room);
 
             const players = this.rooms.get(room);
 

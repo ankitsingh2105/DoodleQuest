@@ -10,7 +10,9 @@ const Home = () => {
     const navigate = useNavigate();
     const [navLink, setNavLink] = useState("/");
 
-
+    useEffect(()=>{
+        toast.info("This game is running on free tier service please wait for 10-15 second before joining or creating rooms", {autoClose : 8000, position : "top-center"});
+    },[])
     const handleJoinRoom = async () => {
         const playerName = document.getElementById('playerName').value;
         const roomId = document.getElementById('roomId').value;

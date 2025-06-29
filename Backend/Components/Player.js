@@ -17,10 +17,8 @@ class Player {
             this.socket.join(this.room);
             for (let player of allRooms.get(this.room)) {
                 const { socketID, name, room, points, role, ready } = player;
-                console.log("my role : :", role, ready);
                 allPlayersInRoom.push({ socketID, name, room, points, role, ready });
             }
-            console.log(" op ankit :: >> ", allPlayersInRoom);
             this.emitUpdate(allPlayersInRoom);
             this.io.to(this.room).emit("newPlayer", { room: this.room, name: this.name, playerSocketID: this.socketID, role: this.role });
         } catch (error) {
@@ -30,7 +28,6 @@ class Player {
 
     emitUpdate(players) {
         try {
-            console.log("players:: ", players);
             if (!players || !Array.isArray(players)) throw new Error("Invalid players data");
             this.io.to(this.room).emit("updatePlayerList", Array.from(players));
         } catch (error) {
@@ -54,9 +51,7 @@ class Player {
             if (!players) {
                 throw new Error(`No players found in room: ${this.room}`);
             }
-            console.log(this.ready);
             this.ready = !this.ready;
-            console.log(this.ready);
             for (let player of players) {
                 const { socketID, name, room, points, role, ready } = player;
                 allPlayersInRoom.push({ socketID, name, room, points, role, ready });

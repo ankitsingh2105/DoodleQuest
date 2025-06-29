@@ -9,11 +9,9 @@ class AdminPlayer extends Player {
 
     kickUser(targetSocketID, allRooms, targetRoom) {
         try {
-            console.log("kicking in backend");
             if (!targetRoom) throw new Error("Target not in any room");
 
             const players = allRooms.get(targetRoom);
-            console.log("all player :: ", players);
             if (!players) throw new Error("Room not found");
 
             for (let player of players) {
@@ -31,8 +29,6 @@ class AdminPlayer extends Player {
     }
     startGame(currentIteration, room, loopCount, customDrawTime, difficulty) {
         try {
-            console.log(room);
-            console.log("in start game admin");
             if (!room) {
                 throw new Error("Room ID is required to start the game.");
             }

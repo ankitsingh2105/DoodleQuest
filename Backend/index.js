@@ -1,4 +1,5 @@
 const express = require("express");
+const dotenv = require('dotenv');
 const app = express();
 const http = require("http");
 const cors = require("cors");
@@ -10,6 +11,7 @@ const LokiTransport = require("winston-loki");
 const RoomManager = require("./Components/RoomManger");
 const ChatManager = require("./Components/ChatManager");
 
+dotenv.config();
 const server = http.createServer(app);
 
 const corsOptions = {
@@ -95,15 +97,13 @@ process.on("unhandledRejection", (reason, promise) => {
     console.error("🔥 Unhandled Rejection at:", promise, "reason:", reason);
 });
 
-
-
 const roomManager = new RoomManager();
 const chatManager = new ChatManager(io, logger);
 
 app.get("/allRooms", (req, response) => {
     console.log(roomManager.showRooms());
     return response.json({ allRooms: roomManager.showRooms() });
-})
+});
 
 roomManager.setIO(io);
 roomManager.setLogger(logger);
@@ -114,99 +114,169 @@ io.on("connection", (socket) => {
     activeUsersGauge.inc();
 
     socket.on("join-room", (info) => {
-        console.log("new user ::", info)
-        roomManager.joinRoom(socket, info);
+        try {
+            console.log("new user ::", info);
+            roomManager.joinRoom(socket, info);
+        } catch (error) {
+            logger.error(`Error in join-room event: ${error.message}`, { stack: error.stack });
+            socket.emit("error", { message: "Failed to join room" });
+        }
     });
 
     socket.on("draw", ({ room, offsetX, offsetY, color, strokeSize }) => {
-        logger.info("Draw event: Drawing");
-        io.to(room).emit("draw", { offsetX, offsetY, color, socketID: socket.id, strokeSize });
+        try {
+            logger.info("Draw event: Drawing");
+            io.to(room).emit("draw", { offsetX, offsetY, color, socketID: socket.id, strokeSize });
+        } catch (error) {
+            logger.error(`Error in draw event: ${error.message}`, { stack: error.stack });
+            socket.emit("error", { message: "Failed to process draw event" });
+        }
     });
 
     socket.on("stopDrawing", (room) => {
-        logger.info("Draw event: Stop drawing");
-        io.to(room).emit("stopDrawing", { room, playerID: socket.id });
+        try {
+            logger.info("Draw event: Stop drawing");
+            io.to(room).emit("stopDrawing", { room, playerID: socket.id });
+        } catch (error) {
+            logger.error(`Error in stopDrawing event: ${error.message}`, { stack: error.stack });
+            socket.emit("error", { message: "Failed to process stop drawing event" });
+        }
     });
 
     socket.on("clear", ({ room, width, height }) => {
-        logger.info("Draw event: Clear canvas");
-        io.to(room).emit("clear", { width, height });
+        try {
+            logger.info("Draw event: Clear canvas");
+            io.to(room).emit("clear", { width, height });
+        } catch (error) {
+            logger.error(`Error in clear event: ${error.message}`, { stack: error.stack });
+            socket.emit("error", { message: "Failed to process clear canvas event" });
+        }
     });
 
     socket.on("beginPath", ({ room, offsetX, offsetY, strokeSize }) => {
-        logger.info("Draw event: Begin path");
-        socket.to(room).emit("beginPath", { offsetX, offsetY, socketID: socket.id, strokeSize });
+        try {
+            logger.info("Draw event: Begin path");
+            socket.to(room).emit("beginPath", { offsetX, offsetY, socketID: socket.id, strokeSize });
+        } catch (error) {
+            logger.error(`Error in beginPath event: ${error.message}`, { stack: error.stack });
+            socket.emit("error", { message: "Failed to process begin path event" });
+        }
     });
 
     socket.on("sendMessage", (info) => {
-        chatManager.sendMessage(info);
+        try {
+            chatManager.sendMessage(info);
+        } catch (error) {
+            logger.error(`Error in sendMessage event: ${error.message}`, { stack: error.stack });
+            socket.emit("error", { message: "Failed to send message" });
+        }
     });
 
-    // todo :: admin privilege
     socket.on("startGame", ({ currentIteration, room, loopCount, customDrawTime, difficulty }) => {
-        logger.info(`Received startGame from ${socket.id}: ${currentIteration}`);
-        const players = roomManager.rooms.get(room);
-        if (!players) return;
+        try {
+            logger.info(`Received startGame from ${socket.id}: ${currentIteration}`);
+            const players = roomManager.rooms.get(room);
+            if (!players) {
+                throw new Error("Room not found");
+            }
 
-        const admin = [...players].find(p => p.socketID === socket.id && p.role === "admin");
-        if (admin && typeof admin.kickUser === "function") {
-            admin.startGame(currentIteration, room, loopCount, customDrawTime, difficulty);
-        } else {
-            console.warn(`Error in starting the game in index.js  ${socket.id}`);
+            const admin = [...players].find(p => p.socketID === socket.id && p.role === "admin");
+            if (admin && typeof admin.startGame === "function") {
+                admin.startGame(currentIteration, room, loopCount, customDrawTime, difficulty);
+            } else {
+                throw new Error("Not authorized or startGame function not found");
+            }
+        } catch (error) {
+            logger.error(`Error in startGame event: ${error.message}`, { stack: error.stack });
+            socket.emit("error", { message: "Failed to start game" });
         }
     });
 
     socket.on("kickUser", ({ room, socketID: targetSocketID }) => {
-        const players = roomManager.rooms.get(room);
-        if (!players) return;
+        try {
+            const players = roomManager.rooms.get(room);
+            if (!players) {
+                throw new Error("Room not found");
+            }
 
-        const admin = [...players].find(p => p.socketID === socket.id && p.role === "admin");
-        if (admin && typeof admin.kickUser === "function") {
-            admin.kickUser(targetSocketID, roomManager.rooms, room);
-        } else {
-            console.warn(`not allowed ${socket.id}`);
+            const admin = [...players].find(p => p.socketID === socket.id && p.role === "admin");
+            if (admin && typeof admin.kickUser === "function") {
+                admin.kickUser(targetSocketID, roomManager.rooms, room);
+            } else {
+                throw new Error("Not authorized or kickUser function not found");
+            }
+        } catch (error) {
+            logger.error(`Error in kickUser event: ${error.message}`, { stack: error.stack });
+            socket.emit("error", { message: "Failed to kick user" });
         }
     });
 
     socket.on("wordToGuess", ({ word, room }) => {
-        logger.info("Guess the word event");
-        io.to(room).emit("wordToGuess", word);
+        try {
+            logger.info("Guess the word event");
+            io.to(room).emit("wordToGuess", word);
+        } catch (error) {
+            logger.error(`Error in wordToGuess event: ${error.message}`, { stack: error.stack });
+            socket.emit("error", { message: "Failed to process word to guess" });
+        }
     });
 
     socket.on("updatePlayerPoints", (info) => {
-        const { name, drawTime, room, playerID, isReady } = info
-        roomManager.updatePlayerPoints(info);
-        io.to(room).emit("playerGotRightAnswer", { name,  playerWithCorrectAnswer : playerID, drawTime })
+        try {
+            const { name, drawTime, room, playerID, isReady } = info;
+            roomManager.updatePlayerPoints(info);
+            io.to(room).emit("playerGotRightAnswer", { name, playerWithCorrectAnswer: playerID, drawTime });
+        } catch (error) {
+            logger.error(`Error in updatePlayerPoints event: ${error.message}`, { stack: error.stack });
+            socket.emit("error", { message: "Failed to update player points" });
+        }
     });
 
     socket.on("gameOver", ({ room }) => {
-        logger.info("Game over event");
-        io.to(room).emit("gameOver");
+        try {
+            logger.info("Game over event");
+            io.to(room).emit("gameOver");
+        } catch (error) {
+            logger.error(`Error in gameOver event: ${error.message}`, { stack: error.stack });
+            socket.emit("error", { message: "Failed to process game over event" });
+        }
     });
 
     socket.on("hideScoreCard", ({ room }) => {
-        logger.info("Hide scorecard event");
-        io.to(room).emit("hideScoreCard");
+        try {
+            logger.info("Hide scorecard event");
+            io.to(room).emit("hideScoreCard");
+        } catch (error) {
+            logger.error(`Error in hideScoreCard event: ${error.message}`, { stack: error.stack });
+            socket.emit("error", { message: "Failed to hide scorecard" });
+        }
     });
 
-
     socket.on("playerReady", ({ playerID, isReady, room, name }) => {
-        roomManager.updatePlayerReadyState({ playerID, isReady, room, name });
-    })
-
+        try {
+            roomManager.updatePlayerReadyState({ playerID, isReady, room, name });
+        } catch (error) {
+            logger.error(`Error in playerReady event: ${error.message}`, { stack: error.stack });
+            socket.emit("error", { message: "Failed to update player ready state" });
+        }
+    });
 
     socket.on("disconnect", () => {
-        logger.info(`User disconnected: ${socket.id}`);
-        activeUsersGauge.dec();
-        roomManager.removePlayer(socket.id);
+        try {
+            logger.info(`User disconnected: ${socket.id}`);
+            activeUsersGauge.dec();
+            roomManager.removePlayer(socket.id);
+        } catch (error) {
+            logger.error(`Error in disconnect event: ${error.message}`, { stack: error.stack });
+        }
     });
 });
 
 app.get("/", (req, response) => {
     response.send("Live Now");
-});
+}); 
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT;
 server.listen(PORT, () => {
-    logger.info(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });

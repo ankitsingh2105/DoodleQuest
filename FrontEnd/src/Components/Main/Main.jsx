@@ -36,7 +36,6 @@ export default function Main() {
 
 
     useEffect(() => {
-        toast.success("This service is running on a free tier, might take some time to load", { autoClose: 4000 });
         console.log('%c⚡WELCOME⚡', 'font-size: 32px; color: LIGHTGREEN; font-weight: bold;');
         backgroundMusic.current = new Audio('/backgroundMusic.mp3');
         backgroundMusic.current.loop = true;
@@ -49,7 +48,7 @@ export default function Main() {
         if (!socket.current.connected) {
             socket.current.connect();
         }
-        socket.current.emit("join-room", { room, name, role });
+        socket.current.emit("join-room", { room, name, role, ready : false });
     }, [room, socket]);
 
     useEffect(() => {
@@ -392,6 +391,7 @@ export default function Main() {
                             <b className='flex justify-center text-3xl' >Admin Privlages</b>
                             <ul>
                                 <li className='p-2'>1. Admin can kick the player using the button below the player's name</li>
+                                <li className='p-2'>4. Admin can start the game</li>
                                 <li className='p-2'>2. Admin can set the draw duration</li>
                                 <li className='p-2'>3. Admin can set the difficulty</li>
                             </ul>

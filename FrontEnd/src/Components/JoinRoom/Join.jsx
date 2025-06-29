@@ -64,10 +64,6 @@ const Home = () => {
     const [userName, setuserName] = useState("")
     const [room, setroom] = useState("");
 
-    useEffect(() => {
-        localStorage.removeItem("userPresent");
-    }, [])
-
     const scrollToJoin = () => {
         const joinSection = document.getElementById('playerName');
         joinSection.scrollIntoView({ behavior: 'smooth' });

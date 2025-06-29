@@ -2,7 +2,7 @@ import { LogOut } from 'lucide-react';
 
 export default function Players({ room, playerList, socket }) {
   const emojis = [
-    "🤭", "🥴", "🥴", "🤩", "🧐", "😅", "😂", "🤣", "😊", "😇",
+    "🤭", "🥴", "😴", "🤩", "🧐", "😅", "😂", "🤣", "😊", "😇",
     "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚",
     "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩",
     "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣", "😖",
@@ -14,10 +14,8 @@ export default function Players({ room, playerList, socket }) {
   ];
 
   const role = sessionStorage.getItem('role');
-  console.log(playerList)
   const kickPlayer = (room, socketID) => {
     socket.emit("kickUser", ({ room, socketID }));
-    console.log("emitted");
   }
 
   return (
@@ -33,15 +31,12 @@ export default function Players({ room, playerList, socket }) {
         {[...playerList].sort((a, b) => b.points - a.points).map((player, index) => (
           <div
             key={index}
-            className={`p-4 rounded-md text-center ${index % 2 === 0 ? 'bg-gray-100' : 'bg-green-100'
-              }`}
+            className={`p-4 rounded-md text-center ${index % 2 === 0 ? 'bg-gray-100' : 'bg-green-100'}`}
           >
             <div className="text-lg font-semibold">
               {player.name} {emojis[index]}
               <div className="text-sm text-green-500">
-                {
-                  player.role === "admin" ? <b>{player.role} </b> : <></>
-                }
+                {player.role === "admin" && <b>{player.role}</b>}
               </div>
             </div>
 
@@ -49,25 +44,31 @@ export default function Players({ room, playerList, socket }) {
               Points: <b>{player.points}</b>
             </div>
 
+            {/* Show ready status if logged-in user is NOT admin */}
+            {player.role !== "admin" ?
+              <div className="text-sm">
+                Ready: <b>{player.ready ? <b className='text-green-500' >Yes</b> : <b className='text-red-500'>No</b>}</b>
+              </div>
+              : <></>
+            }
+
             <center
               onClick={() => kickPlayer(room, player.socketID)}
               className={`relative text-sm text-gray-700 ${role !== "admin" ? "hidden" : ""} hover:cursor-pointer group`}
             >
-              {
-                player.role === "admin" ? null : (
-                  <div className="relative flex items-center justify-center">
-                    <LogOut color="#FF474D" strokeWidth={4} />
-                    <span className="absolute -top-6 scale-0 group-hover:scale-100 transition-transform text-xs bg-gray-800 text-white px-2 py-1 rounded">
-                      Kickout user
-                    </span>
-                  </div>
-                )
-              }
+              {player.role !== "admin" && (
+                <div className="relative flex items-center justify-center">
+                  <LogOut color="#FF474D" strokeWidth={3} />
+                  <span className="absolute -top-6 scale-0 group-hover:scale-100 transition-transform text-xs bg-gray-800 text-white px-2 py-1 rounded">
+                    Kickout user
+                  </span>
+                </div>
+              )}
             </center>
-
           </div>
         ))}
       </div>
+
 
     </div>
   );

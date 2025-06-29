@@ -4,7 +4,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 export default function InfoBar(props) {
   const { playerID, socket, player, name, setplayer, room, setDisableCanvas } = props;
-
   const [answer, setAnswer] = useState("");
   const [item, setItem] = useState("");
   const [random, setrandom] = useState(0);
@@ -13,8 +12,16 @@ export default function InfoBar(props) {
   const [playerDrawing, setPlayerDrawing] = useState("");
   const [inputDisable, setInputDisable] = useState(false);
   const [disableStart, setStartDisable] = useState(false);
+  const [disableReady, setReadyDisable] = useState(false);
   const [customDrawTime, setCustomDrawTime] = useState(25);
   const [difficulty, setDifficulty] = useState('Easy');
+  const [isReady, setIsReady] = useState(false);
+  const playerIDRef = useRef(playerID);
+
+  useEffect(() => {
+    playerIDRef.current = playerID;
+  }, [playerID]);
+
 
   const questions = useRef(null);
   const whoDrawingNow = useRef(null);
@@ -67,9 +74,11 @@ export default function InfoBar(props) {
     return new Promise((resolve) => setTimeout(resolve, customDrawTime * 1000));
   }
 
+
   useEffect(() => {
     const handleAcknowledgement = async ({ currentIteration, loopCount, customDrawTime, difficulty }) => {
       setStartDisable(true);
+      setReadyDisable(true);
       setCustomDrawTime(customDrawTime);
       setDifficulty(difficulty);
       const currentPlayer = player[currentIteration];
@@ -98,6 +107,14 @@ export default function InfoBar(props) {
   }, [player, name, customDrawTime]);
 
   const StartGame = async () => {
+    let numberOfReady = 0;
+    player.forEach(element => {
+      if (element.ready == true) numberOfReady++;
+    });
+    if (numberOfReady + 1 != player.length) {
+      toast.error("All players are not ready", { autoClose: 1000 });
+      return;
+    }
     setInputDisable(false);
     setDisableCanvas(false);
     let loopCount = player.length;
@@ -106,12 +123,12 @@ export default function InfoBar(props) {
       return;
     }
     let currentIteration = 0;
-    socket.emit('myEvent', { currentIteration, room, customDrawTime, difficulty });
+    socket.emit('startGame', { currentIteration, room, customDrawTime, difficulty });
 
     const interval = setInterval(async () => {
       if (currentIteration < loopCount - 1) {
         currentIteration++;
-        socket.emit('myEvent', { currentIteration, room, customDrawTime, difficulty });
+        socket.emit('startGame', { currentIteration, room, customDrawTime, difficulty });
         setInputDisable(false);
         setDisableCanvas(false);
       }
@@ -124,11 +141,16 @@ export default function InfoBar(props) {
     }, customDrawTime * 1000);
   };
 
+  const PlayerReady = () => {
+    setIsReady(!isReady);
+    socket.emit("playerReady", ({ playerID, isReady, room, name }))
+  }
+
   const handleEnter = async (e) => {
     if (e.key === 'Enter') {
       if (item === answer) {
         correct_answer.play();
-        socket.emit("updatePlayerPoints", { name, drawTime, room, playerID });
+        socket.emit("updatePlayerPoints", { name, drawTime, room, playerID, isReady });
         setInputDisable(true);
       }
       else {
@@ -154,12 +176,12 @@ export default function InfoBar(props) {
 
     socket.on("gameOver", () => {
       setStartDisable(false);
+      setReadyDisable(false);
       whoDrawingNow.current.style.display = "none";
     })
 
-    socket.on("playerGotRightAnswer", ({ name, playerID: playerWithConnectAnswer, drawTime }) => {
-      console.log(playerWithConnectAnswer);
-      if (playerID === playerWithConnectAnswer) {
+    socket.on("playerGotRightAnswer", ({ name, playerWithCorrectAnswer, drawTime }) => {
+      if (playerIDRef.current === playerWithCorrectAnswer) {
         toast.success(`You got the right answer in ${drawTime}`, { autoClose: 2000 });
         correct_answer.play();
       }
@@ -221,14 +243,27 @@ export default function InfoBar(props) {
           className="font-normal border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400 w-70 p-2"
         />
 
-        <button
-          onClick={StartGame}
-          className="px-4 py-2 text-white rounded-md font-bold"
-          style={{ backgroundColor: 'oklch(65.6% 0.241 354.308)' }}
-          disabled={disableStart}
-        >
-          Start
-        </button>
+        {
+          role == "admin" ?
+            <button
+              onClick={StartGame}
+              className="px-4 py-2 text-white rounded-md font-bold"
+              style={{ backgroundColor: 'oklch(65.6% 0.241 354.308)' }}
+              disabled={disableStart}
+            >
+              Start
+            </button>
+            :
+            <button
+              onClick={PlayerReady}
+              className="px-4 py-2 text-white rounded-md font-bold"
+              style={{ backgroundColor: 'oklch(65.6% 0.241 354.308)' }}
+              disabled={disableReady}
+            >
+              Ready
+            </button>
+        }
+
       </div>
 
       {/* Admin controls */}

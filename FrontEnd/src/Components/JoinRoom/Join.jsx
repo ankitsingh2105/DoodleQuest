@@ -39,6 +39,7 @@ const Home = () => {
         }
     }
     useEffect(() => {
+        axios.get(`${backendLink}`).catch(() => {});
         showStatus();
     }, [])
 

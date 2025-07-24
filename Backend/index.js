@@ -15,9 +15,18 @@ dotenv.config();
 const server = http.createServer(app);
 
 const corsOptions = {
-    origin: ["http://localhost:5173", "https://doodlequest.vercel.app", "https://doodlequest.games"],
-    credentials: true,
+  origin: [
+    "http://localhost:5173",
+
+    "https://doodlequest.vercel.app",
+    "https://www.doodlequest.vercel.app",
+
+    "https://doodlequest.games",
+    "https://www.doodlequest.games"
+  ],
+  credentials: true,
 };
+
 
 app.use(cors(corsOptions));
 

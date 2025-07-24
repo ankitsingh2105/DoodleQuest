@@ -31,11 +31,18 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 const io = new Server(server, {
-    cors: {
-        origin: ["https://doodlequest.vercel.app", "http://localhost:5173", "https://doodlequest.games"],
-        credentials: true,
-    }
+  cors: {
+    origin: [
+      "http://localhost:5173",
+      "https://doodlequest.vercel.app",
+      "https://www.doodlequest.vercel.app",
+      "https://doodlequest.games",
+      "https://www.doodlequest.games"
+    ],
+    credentials: true,
+  },
 });
+
 
 const logger = createLogger({
     format: format.json(),

@@ -1,0 +1,19 @@
+FROM node:18
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY FrontEnd/package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the frontend code
+COPY FrontEnd .
+
+# Expose the port Vite uses (default: 5173)
+EXPOSE 5173
+
+# Start the dev server
+CMD ["npm", "run", "dev"]

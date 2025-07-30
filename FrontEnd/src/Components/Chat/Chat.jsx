@@ -46,9 +46,8 @@ export default function Chat({ name, room, socket }) {
         {allMessages.slice().reverse().map((msg, index) => (
           <div
             key={index}
-            className={`p-2 mb-1 rounded-md ${
-              index % 2 === 0 ? 'bg-gray-100' : 'bg-green-100'
-            } flex justify-between items-center`}
+            className={`p-2 mb-1 rounded-md ${index % 2 === 0 ? 'bg-gray-100' : 'bg-green-100'
+              } flex justify-between items-center`}
           >
             <div className="text-sm">
               <strong>{msg.name}:</strong> {msg.message}

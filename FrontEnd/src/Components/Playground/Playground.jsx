@@ -2,18 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import { Eraser } from 'lucide-react';
-import "./Main.css"
+import "./Playground.css"
 
-import "./Main.css";
-import Chat from '../Chat/Chat';
-import Players from '../Players/Players';
-import InfoBar from '../InfoBar/InfoBar';
+import "./Playground.css";
+import Chat from '../Chat/Chat.jsx';
+import Players from '../Players/Players.jsx';
+import InfoBar from '../InfoBar/InfoBar.jsx';
 import { toast } from 'react-toastify';
 import backendLink from '@/backendlink.js';
 import websocket from './socket.js';
 import { VolumeX, Volume2 } from 'lucide-react';
 
-export default function Main() {
+export default function Playground() {
     const [searchParams] = useSearchParams();
     const room = searchParams.get('roomID');
     const name = searchParams.get("name");
@@ -271,7 +271,7 @@ export default function Main() {
 
     return (
         <>
-            <main className="flex flex-col items-center justify-center bg-gray-100 space-y-6" style={{
+            <main className="flex flex-col items-center justify-center bg-gray-100 space-y-6 min-h-0" style={{
                 transform: "scale(0.9)",
                 transformOrigin: "top left",
                 width: "111.11%",

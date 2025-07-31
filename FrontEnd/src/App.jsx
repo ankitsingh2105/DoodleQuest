@@ -1,7 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Join from './Components/JoinRoom/Join';
-import Main from './Components/Main/Main';
+import Main from './Components/Playground/Playground';
 export default function App() {
   return (
     <>

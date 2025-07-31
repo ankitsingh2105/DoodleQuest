@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import "./Join.css"
-import "./Join.css";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify"
 import backendLink from '../../../backendlink';
@@ -21,27 +20,27 @@ const Home = () => {
         "App is live"
     ];
 
-    const showMessages = async(message) =>{
-        return new Promise((resolve, reject)=>{
+    const showMessages = async (message) => {
+        return new Promise((resolve, reject) => {
             setTimeout(() => {
-                toast.info(message, {position : "top-center", autoClose:2500, color : "green"});
+                toast.info(message, { position: "top-center", autoClose: 2500, color: "green" });
                 resolve();
             }, 2500);
         })
     }
-    const showStatus = async () =>{
-        if(sessionStorage.getItem("loading") == "true") return;
-        toast.info(actions[0], {position : "top-center", autoClose:2500});
-        toast.info("Please wait for some time before joining or creating", {position : "top-right", autoClose:20000});
+    const showStatus = async () => {
+        if (sessionStorage.getItem("loading") == "true") return;
+        toast.info(actions[0], { position: "top-center", autoClose: 2500 });
+        toast.info("Please wait for some time before joining or creating", { position: "top-right", autoClose: 20000 });
         for (let i = 1; i < 9; i++) {
             await showMessages(actions[i]);
-            sessionStorage.setItem("loading" , true);
+            sessionStorage.setItem("loading", true);
         }
     }
-    useEffect(() => {
-        axios.get(`${backendLink}`).catch(() => {});
-        showStatus();
-    }, [])
+    // useEffect(() => {
+    //     axios.get(`${backendLink}`).catch(() => {});
+    //     showStatus();
+    // }, [])
 
 
     const handleJoinRoom = async () => {
@@ -108,7 +107,7 @@ const Home = () => {
             transform: "scale(0.9)",
             transformOrigin: "top left",
             width: "111.11%",
-        }} className="font-['Fredoka'] bg-[#f0f9ff] relative overflow-hidden">
+        }} className="bg-blue-50">
 
 
             <ToastContainer />
@@ -116,18 +115,36 @@ const Home = () => {
 
             {/* Navigation */}
             <nav className="bg-white bg-opacity-90 backdrop-blur-sm shadow-md py-4 px-6 sticky top-0 z-50">
-                <div className="container mx-auto flex justify-between items-center">
+                <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
+                    {/* Left: Logo + Title */}
                     <div className="flex items-center gap-2">
-                        <svg className="w-10 h-10 text-indigo-600" fill="currentColor" viewBox="0 0 24 24">
+                        <svg
+                            className="w-8 sm:w-10 h-8 sm:h-10 text-indigo-600"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                            role="img"
+                            aria-label="DoodleQuest logo"
+                        >
                             <path d="M8.5,3A5.5,5.5 0 0,1 14,8.5C14,9.83 13.53,11.05 12.74,12H21V21H12V12.74C11.05,13.53 9.83,14 8.5,14A5.5,5.5 0 0,1 3,8.5A5.5,5.5 0 0,1 8.5,3M8.5,5A3.5,3.5 0 0,0 5,8.5A3.5,3.5 0 0,0 8.5,12A3.5,3.5 0 0,0 12,8.5A3.5,3.5 0 0,0 8.5,5Z" />
                         </svg>
-                        <h1 className="text-5xl font-bold text-indigo-600">DoodleQuest</h1>
+                        <h1 className="text-3xl sm:text-5xl font-bold text-indigo-600">DoodleQuest</h1>
                     </div>
-                    <div>
-                        <a className="text-2xl font-bold text-pink-500" href="http://ankitsinghchauhan.in">Game by Ankit Chauhan</a>
+
+                    {/* Right: Link */}
+                    <div className="text-center sm:text-right">
+                        <a
+                            className="text-lg sm:text-2xl font-bold text-pink-500"
+                            href="http://ankitsinghchauhan.in"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Visit Ankit Chauhan's website"
+                        >
+                            Game by Ankit Chauhan
+                        </a>
                     </div>
                 </div>
             </nav>
+
 
             {/* Hero Section */}
             <section className="py-16 px-6">
@@ -239,7 +256,7 @@ const Home = () => {
                     <p className="text-xl mb-8 max-w-2xl mx-auto">Join thousands of players already enjoying DoodleQuest. Enter your name, create a room, and start playing now!</p>
                     <div className="flex justify-center">
                         <button onClick={scrollToJoin} className="px-8 py-4 bg-white text-indigo-600 font-bold rounded-full text-lg hover:bg-gray-100 transition shadow-lg">
-                            Get Started
+                            JOIN NOW!
                         </button>
                     </div>
                 </div>

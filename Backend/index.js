@@ -292,7 +292,7 @@ app.get("/", (req, response) => {
     response.send("Live Now");
 }); 
 
-const PORT = process.env.PORT;
+const PORT = 8000;
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

@@ -289,7 +289,7 @@ io.on("connection", (socket) => {
 });
 
 app.get("/", (req, response) => {
-    response.send("DoodleQuest is now live");
+    response.send("DoodleQuest is now live ⚡");
 }); 
 
 const PORT = 8000;

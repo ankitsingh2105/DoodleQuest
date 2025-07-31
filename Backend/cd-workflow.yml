@@ -2,33 +2,33 @@ name: CICD
 
 on:
   push:
-    branches: ["add-cd-pipeline", "main"]
+    branches: ["main", "add-cd-pipeline"]
 
 jobs:
   build:
-    runs-on: [ubuntu-latest]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
 
       - name: Login to Docker Hub
-        run: docker login -u ${{ secrets.DOCKER_USERS_NAME }} -p ${{ secrets.DOCKER_PASSWORD }} 
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERS_NAME }}" --password-stdin
 
       - name: Build Docker image
-        run: docker build -t ankitchauhan21/doodlebackend .
+        run: docker build -t ankitchauhan21/doodlebackend ./Backend
 
-      - name: Push image to Docker Hub
+      - name: Push Docker image
         run: docker push ankitchauhan21/doodlebackend:latest
 
   deploy:
     needs: build
     runs-on: self-hosted
     steps:
-      - name: Pull image from Docker Hub
+      - name: Pull Docker image
         run: docker pull ankitchauhan21/doodlebackend:latest
 
-      - name: Delete old container
-        run: docker rm -f doodlebcontainer || true  # '|| true' to ignore error if container doesn't exist
+      - name: Remove old container
+        run: docker rm -f doodlecontainer || true
 
-      - name: Run Docker container
-        run: docker run -d -p 8000:8000 --name doodlebcontainer ankitchauhan21/doodlebackend
+      - name: Run new container
+        run: docker run -d -p 8000:8000 --name doodlecontainer ankitchauhan21/doodlebackend:latest

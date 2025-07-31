@@ -1,0 +1,26 @@
+# Stage 1 — Build environment
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy only package files for better cache
+COPY package*.json ./
+RUN npm install
+
+# Copy entire backend source code
+COPY . .
+
+# These dependencies stay in the builder image, which is discarded after the build — not included in your final image.
+
+# Stage 2 — Production image
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install --only=production
+
+COPY --from=builder /app ./
+
+EXPOSE 8000
+CMD ["node", "index.js"]

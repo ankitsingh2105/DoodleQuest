@@ -3,6 +3,9 @@ name: CICD
 on:
   push:
     branches: ["main", "add-cd-pipeline"]
+    paths :
+      - "Backend/**" 
+      - ".github/workflows/**"
 
 jobs:
   build:

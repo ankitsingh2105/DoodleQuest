@@ -289,10 +289,11 @@ io.on("connection", (socket) => {
 });
 
 app.get("/", (req, response) => {
-    response.send("DoodleQuest is now live ⚡⚡");
+    response.send("DoodleQuest is now live on AWS⚡⚡");
 }); 
 
 const PORT = 8000;
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+
 });

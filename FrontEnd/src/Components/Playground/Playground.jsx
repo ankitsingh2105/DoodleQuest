@@ -9,7 +9,6 @@ import Chat from '../Chat/Chat.jsx';
 import Players from '../Players/Players.jsx';
 import InfoBar from '../InfoBar/InfoBar.jsx';
 import { toast } from 'react-toastify';
-import backendLink from '@/backendlink.js';
 import websocket from './socket.js';
 import { VolumeX, Volume2 } from 'lucide-react';
 

@@ -27,6 +27,7 @@ A multiplayer online drawing and guessing game inspired by Scribble. It allows u
 - **Express & Node.js:** Powered the backend server logic.  
 - **React.js:** Built a dynamic and responsive frontend.  
 - **Socket.io:** Simplified real-time event handling.
+- **Nginx:** For load balancing
 
 ---
 

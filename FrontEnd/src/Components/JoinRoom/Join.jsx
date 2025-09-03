@@ -8,40 +8,6 @@ import backendLink from '../../../backendlink';
 const Home = () => {
     const navigate = useNavigate();
     const [navLink, setNavLink] = useState("/");
-    const actions = [
-        "Incoming HTTP request detected",
-        "Service waking up",
-        "Allocating compute resources",
-        "Preparing instance for initialization",
-        "Starting the instance",
-        "Environment variables injected",
-        "Finalizing startup",
-        "Optimizing deployment",
-        "App is live"
-    ];
-
-    const showMessages = async (message) => {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                toast.info(message, { position: "top-center", autoClose: 2500, color: "green" });
-                resolve();
-            }, 2500);
-        })
-    }
-    const showStatus = async () => {
-        if (sessionStorage.getItem("loading") == "true") return;
-        toast.info(actions[0], { position: "top-center", autoClose: 2500 });
-        toast.info("Please wait for some time before joining or creating", { position: "top-right", autoClose: 20000 });
-        for (let i = 1; i < 9; i++) {
-            await showMessages(actions[i]);
-            sessionStorage.setItem("loading", true);
-        }
-    }
-    // useEffect(() => {
-    //     axios.get(`${backendLink}`).catch(() => {});
-    //     showStatus();
-    // }, [])
-
 
     const handleJoinRoom = async () => {
         const playerName = document.getElementById('playerName').value;
@@ -62,7 +28,7 @@ const Home = () => {
         let allRoomData = rooms.data.allRooms;
 
         if (!allRoomData.includes(room)) {
-            toast.error("No such rooms exist, plase create one", { autoClose: 1500 });
+            toast.error("No such rooms exist, please create one", { autoClose: 1500 });
             return;
         }
         sessionStorage.setItem("role", "regular");
@@ -82,6 +48,7 @@ const Home = () => {
         }
 
         let rooms = await axios.get(`${backendLink}/allRooms`);
+        console.log("all rooms :: " , rooms);
 
         let allRoomData = rooms.data.allRooms;
 

@@ -48,7 +48,6 @@ class RoomManager {
     }
 
     joinRoom(socket, { room, name, role, ready }) {
-        console.log("in join room :: ", role, ready);
         try {
             this.playerToRoom.set(socket.id, room);
             if (!this.rooms.has(room)) {

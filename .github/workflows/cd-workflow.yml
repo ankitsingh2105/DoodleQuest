@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
   push:
     branches: ["main", "add-cd-pipeline"]
-    paths :
-      - "Backend/**" 
+    paths:
+      - "Backend/**"
       - ".github/workflows/**"
 
 jobs:
@@ -24,9 +24,9 @@ jobs:
       - name: Push Docker image
         run: docker push ankitchauhan21/doodlebackend:latest
 
-  deploy:
+  deploy-backend1:
     needs: build
-    runs-on: self-hosted
+    runs-on: [self-hosted, backEnd1]
     steps:
       - name: Pull Docker image
         run: docker pull ankitchauhan21/doodlebackend:latest
@@ -35,5 +35,17 @@ jobs:
         run: docker rm -f doodlecontainer || true
 
       - name: Run new container
+        run: docker run -d -p 8000:8000 --restart always --name doodlecontainer ankitchauhan21/doodlebackend:latest
 
-        run: docker run -d -p 8000:8000 --name doodlecontainer ankitchauhan21/doodlebackend:latest
+  deploy-backend2:
+    needs: build
+    runs-on: [self-hosted, backEnd2]
+    steps:
+      - name: Pull Docker image
+        run: docker pull ankitchauhan21/doodlebackend:latest
+
+      - name: Remove old container
+        run: docker rm -f doodlecontainer || true
+
+      - name: Run new container
+        run: docker run -d -p 8000:8000 --restart always --name doodlecontainer ankitchauhan21/doodlebackend:latest

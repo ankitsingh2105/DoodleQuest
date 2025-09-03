@@ -105,19 +105,11 @@ app.get("/metrics", async (req, res) => {
     res.end(await register.metrics());
 });
 
-process.on("uncaughtException", (err) => {
-    console.error("🔥 Uncaught Exception:", err.stack || err);
-});
-
-process.on("unhandledRejection", (reason, promise) => {
-    console.error("🔥 Unhandled Rejection at:", promise, "reason:", reason);
-});
-
 const roomManager = new RoomManager();
 const chatManager = new ChatManager(io, logger);
 
 app.get("/allRooms", (req, response) => {
-    console.log(roomManager.showRooms());
+    console.log("All rooms :: " ,roomManager.showRooms());
     return response.json({ allRooms: roomManager.showRooms() });
 });
 

@@ -19,17 +19,17 @@ export default function Playground() {
     const socket = useRef(createSocket(room));
     const canvasRef = useRef(null);
     const contextRef = useRef(null);
+    const strokeSizeRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [color, setColor] = useState('#000000');
     const [players, setplayers] = useState([])
     const [playerID, setPlayerID] = useState("");
-    const strokeSizeRef = useRef(null);
     const [strokeSize, setStrokeSize] = useState(5);
     const [disableCanvas, setDisableCanvas] = useState(false);
     const [volumeToggle, setVolumeToggle] = useState(false);
 
-    const playerIDRef = useRef(null); // todo :: to prevent the stale value and prevent wrong updates
-    const finalScorecard = useRef(null); // todo : scoreCard hidden;
+    const playerIDRef = useRef(null); 
+    const finalScorecard = useRef(null); 
     const navigate = useNavigate();
     const backgroundMusic = useRef(null);
 

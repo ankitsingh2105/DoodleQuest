@@ -1,9 +1,11 @@
-import { io } from "socket.io-client";
 
+import { io } from "socket.io-client";
 import backendLink from "../../../backendlink";
 
-const socket = io(`${backendLink}`,{
-    autoConnect : false
-});
-
-export default socket ;  
+export function createSocket(roomID) {
+  return io(backendLink, {
+    autoConnect: false,
+    transports: ["websocket"], 
+    query: { roomID }
+  });
+}

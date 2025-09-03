@@ -9,14 +9,14 @@ import Chat from '../Chat/Chat.jsx';
 import Players from '../Players/Players.jsx';
 import InfoBar from '../InfoBar/InfoBar.jsx';
 import { toast } from 'react-toastify';
-import websocket from './socket.js';
+import { createSocket } from "./socket";
 import { VolumeX, Volume2 } from 'lucide-react';
 
 export default function Playground() {
     const [searchParams] = useSearchParams();
     const room = searchParams.get('roomID');
     const name = searchParams.get("name");
-    const socket = useRef(websocket);
+    const socket = useRef(createSocket(room));
     const canvasRef = useRef(null);
     const contextRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);

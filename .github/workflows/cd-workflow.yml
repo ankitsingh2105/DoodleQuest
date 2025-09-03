@@ -1,6 +1,7 @@
 name: CICD
 
 on:
+  workflow_dispatch:
   push:
     branches: ["main", "add-cd-pipeline"]
     paths :
@@ -34,4 +35,5 @@ jobs:
         run: docker rm -f doodlecontainer || true
 
       - name: Run new container
+
         run: docker run -d -p 8000:8000 --name doodlecontainer ankitchauhan21/doodlebackend:latest

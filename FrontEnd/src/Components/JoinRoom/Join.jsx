@@ -26,6 +26,7 @@ const Home = () => {
         let rooms = await axios.get(`${backendLink}/allRooms`);
 
         let allRoomData = rooms.data.allRooms;
+        console.log("Join all rooms :: ",  playerName,  " : " , allRoomData);
 
         if (!allRoomData.includes(room)) {
             toast.error("No such rooms exist, please create one", { autoClose: 1500 });
@@ -48,9 +49,9 @@ const Home = () => {
         }
 
         let rooms = await axios.get(`${backendLink}/allRooms`);
-        console.log("all rooms :: " , rooms);
-
+        
         let allRoomData = rooms.data.allRooms;
+        console.log("Create all rooms :: ",  playerName,  " : " , allRoomData);
 
         if (allRoomData.includes(room)) {
             toast.error("Room already exists", { autoClose: 1500 });

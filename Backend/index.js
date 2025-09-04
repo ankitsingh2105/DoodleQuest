@@ -27,6 +27,7 @@ const corsOptions = {
 
 
 app.use(cors(corsOptions));
+app.use(express.json());
 
 const io = new Server(server, {
     cors: {
@@ -115,13 +116,17 @@ app.post("/rooms/create", (req, res) => {
         }
 
         console.log("CREATE attempt ::", roomId, "|", userName, "- existing:", roomManager.showRooms());
-        const created = roomManager.createRoomIfNotExists(roomId, userName);
-        if (!created) {
+        const existingRooms = roomManager.showRooms();
+        if (existingRooms.includes(roomId)) {
+            console.log("Room already exists:", roomId);
             return res.status(409).json({ message: "Room already exists." });
+        } 
+        else {
+            console.log("Room can be created:", roomId);
+            return res.status(200).json({ message: "Room can be created." });
         }
-
-        return res.status(201).json({ message: "Room created." });
-    } catch (err) {
+    }
+    catch (err) {
         console.error("Error in /rooms/create:", err);
         return res.status(500).json({ message: "Server error" });
     }
@@ -140,10 +145,12 @@ app.post("/rooms/join", (req, res) => {
 
         if (existingRooms.includes(roomId)) {
             return res.status(200).json({ message: "Room exists, you can join." });
-        } else {
-            return res.status(404).json({ message: "Room does not exist." });
         }
-    } catch (err) {
+        else {
+            return res.status(409).json({ message: "Room does not exist." });
+        }
+    }
+    catch (err) {
         console.error("Error in /rooms/join:", err);
         return res.status(500).json({ message: "Server error" });
     }

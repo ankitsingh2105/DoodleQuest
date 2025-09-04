@@ -23,7 +23,7 @@ const Home = () => {
     }
 
     try {
-        await axios.get(`${backendLink}/rooms/join/${room}`);
+        await axios.get(`${backendLink}/rooms/join/${room}/${userName}`);
         sessionStorage.setItem("role", "regular");
         navigate(`/room?roomID=${room}&name=${userName}`);
     } 
@@ -44,7 +44,7 @@ const Home = () => {
     }
 
     try {
-        await axios.get(`${backendLink}/rooms/create/${room}`);
+        await axios.get(`${backendLink}/rooms/create/${room}/${userName}`);
         sessionStorage.setItem("role", "admin");
         navigate(`/room?roomID=${room}&name=${userName}`);
     } 

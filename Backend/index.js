@@ -111,7 +111,7 @@ app.get("/rooms/join/:roomId/:userName", (req, res) => {
     const userName = req.params.userName;
     const existingRooms = roomManager.showRooms();
     console.log("existingRooms for join : ", roomId, " :: " ,  existingRooms)
-    console.log("existingRooms for join room :: ", roomId, " | username :: ", fb8b40562d4f ,  existingRooms)
+    console.log("existingRooms for join room :: ", roomId, " | username :: " ,  existingRooms)
 
     if (existingRooms.includes(roomId)) {
         return res.status(200).json({ message: "Room exists, you can join." });

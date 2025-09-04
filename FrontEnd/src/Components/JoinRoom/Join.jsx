@@ -11,44 +11,45 @@ const Home = () => {
 
   const handleJoinRoom = async () => {
     if (!userName) {
-      toast.error("Please enter your name to join a room!", {
-        autoClose: 1000,
-      });
-      return;
+        toast.error("Please enter your name to join a room!", {
+          autoClose: 1000,
+        });
+        return;
     }
 
     if (!room) {
-      toast.error("Please enter a room ID to join!", { autoClose: 1000 });
-      return;
+        toast.error("Please enter a room ID to join!", { autoClose: 1000 });
+        return;
     }
 
     try {
-      await axios.get(`${backendLink}/rooms/join/${room}`);
-      sessionStorage.setItem("role", "regular");
-      navigate(`/room?roomID=${room}&name=${userName}`);
-    } catch (err) {
-      toast.error("No such room exists!", { autoClose: 1500 });
+        await axios.get(`${backendLink}/rooms/join/${room}`);
+        sessionStorage.setItem("role", "regular");
+        navigate(`/room?roomID=${room}&name=${userName}`);
+    } 
+    catch (err) {
+        toast.error("No such room exists!", { autoClose: 1500 });
     }
   };
 
   const handleCreateRoom = async () => {
     if (!userName) {
-      toast.error("Please enter your name!", { autoClose: 1000 });
-      return;
+        toast.error("Please enter your name!", { autoClose: 1000 });
+        return;
     }
 
     if (!room) {
-      toast.error("Please enter a room ID!", { autoClose: 1000 });
-      return;
+        toast.error("Please enter a room ID!", { autoClose: 1000 });
+        return;
     }
 
     try {
-      await axios.get(`${backendLink}/rooms/create/${room}`);
-      sessionStorage.setItem("role", "admin");
-      navigate(`/room?roomID=${room}&name=${userName}`);
+        await axios.get(`${backendLink}/rooms/create/${room}`);
+        sessionStorage.setItem("role", "admin");
+        navigate(`/room?roomID=${room}&name=${userName}`);
     } 
     catch (err) {
-      toast.error("Room already exists!", { autoClose: 1500 });
+        toast.error("Room already exists!", { autoClose: 1500 });
     }
   };
 

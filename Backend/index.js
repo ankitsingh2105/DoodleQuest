@@ -109,20 +109,21 @@ const chatManager = new ChatManager(io, logger);
 app.get("/rooms/join/:roomId", (req, res) => {
     const roomId = req.params.roomId;
     const existingRooms = roomManager.showRooms();
+    console.log("existingRooms : ", existingRooms)
 
     if (existingRooms.includes(roomId)) {
         return res.status(200).json({ message: "Room exists, you can join." });
     } else {
-        return res.status(404).json({ message: "Room does not exist." });
+        return res.status(409).json({ message: "Room does not exist." });
     }
 });
 
 app.get("/rooms/create/:roomId", (req, res) => {
     const roomId = req.params.roomId;
     const existingRooms = roomManager.showRooms();
-
+    console.log("existingRooms : ", existingRooms)
     if (existingRooms.includes(roomId)) {
-        return res.status(404).json({ message: "Room already exists." });
+        return res.status(409).json({ message: "Room already exists." });
     } else {
         return res.status(200).json({ message: "Room can be created." });
     }

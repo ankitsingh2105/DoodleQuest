@@ -8,51 +8,54 @@ import backendLink from "../../../backendlink";
 const Home = () => {
   const navigate = useNavigate();
 
-  const handleJoinRoom = async () => {
-    if (!userName) {
-      toast.error("Please enter your name to join a room!", {
-        autoClose: 1000,
-      });
-      return;
-    }
+const handleJoinRoom = async () => {
+  if (!userName) {
+    toast.error("Please enter your name to join a room!", { autoClose: 1000 });
+    return;
+  }
 
-    if (!room) {
-      toast.error("Please enter a room ID to join!", { autoClose: 1000 });
-      return;
-    }
+  if (!room) {
+    toast.error("Please enter a room ID to join!", { autoClose: 1000 });
+    return;
+  }
 
-    try {
-      await axios.get(`${backendLink}/rooms/join/${room}/${userName}`);
-      console.log("Room :", room, " UserName : ", userName);
-      sessionStorage.setItem("role", "regular");
-      navigate(`/room?roomID=${room}&name=${userName}`);
-    } 
-    catch (err) {
-      toast.error("No such room exists!", { autoClose: 1500 });
-    }
-  };
+  try {
+    await axios.post(`${backendLink}/rooms/join`, {
+      roomId: room,
+      userName,
+    });
+    console.log("Room :", room, " UserName : ", userName);
+    sessionStorage.setItem("role", "regular");
+    navigate(`/room?roomID=${room}&name=${userName}`);
+  } catch (err) {
+    toast.error("No such room exists!", { autoClose: 1500 });
+  }
+};
 
-  const handleCreateRoom = async () => {
-    if (!userName) {
-      toast.error("Please enter your name!", { autoClose: 1000 });
-      return;
-    }
+const handleCreateRoom = async () => {
+  if (!userName) {
+    toast.error("Please enter your name!", { autoClose: 1000 });
+    return;
+  }
 
-    if (!room) {
-      toast.error("Please enter a room ID!", { autoClose: 1000 });
-      return;
-    }
+  if (!room) {
+    toast.error("Please enter a room ID!", { autoClose: 1000 });
+    return;
+  }
 
-    try {
-      await axios.get(`${backendLink}/rooms/create/${room}/${userName}`);
-      console.log("Room :", room, " UserName : ", userName);
-      sessionStorage.setItem("role", "admin");
-      navigate(`/room?roomID=${room}&name=${userName}`);
-    } 
-    catch (err) {
-      toast.error("Room already exists!", { autoClose: 1500 });
-    }
-  };
+  try {
+    await axios.post(`${backendLink}/rooms/create`, {
+      roomId: room,
+      userName,
+    });
+    console.log("Room :", room, " UserName : ", userName);
+    sessionStorage.setItem("role", "admin");
+    navigate(`/room?roomID=${room}&name=${userName}`);
+  } catch (err) {
+    toast.error("Room already exists!", { autoClose: 1500 });
+  }
+};
+
 
   const [userName, setuserName] = useState("");
   const [room, setroom] = useState("");

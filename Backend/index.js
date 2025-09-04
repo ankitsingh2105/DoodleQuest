@@ -106,30 +106,49 @@ app.get("/metrics", async (req, res) => {
 const roomManager = new RoomManager();
 const chatManager = new ChatManager(io, logger);
 
-app.get("/rooms/join/:roomId/:userName", (req, res) => {
-    const roomId = req.params.roomId;
-    const userName = req.params.userName;
-    const existingRooms = roomManager.showRooms();
-    console.log("JOIN :: room :: ", roomId, " | username :: ", userName , " -:-",  existingRooms)
+// POST create - actually creates the room
+app.post("/rooms/create", (req, res) => {
+    try {
+        const { roomId, userName } = req.body;
+        if (!roomId || !userName) {
+            return res.status(400).json({ message: "roomId and userName required" });
+        }
 
-    if (existingRooms.includes(roomId)) {
-        return res.status(200).json({ message: "Room exists, you can join." });
-    } else {
-        return res.status(409).json({ message: "Room does not exist." });
+        console.log("CREATE attempt ::", roomId, "|", userName, "- existing:", roomManager.showRooms());
+        const created = roomManager.createRoomIfNotExists(roomId, userName);
+        if (!created) {
+            return res.status(409).json({ message: "Room already exists." });
+        }
+
+        return res.status(201).json({ message: "Room created." });
+    } catch (err) {
+        console.error("Error in /rooms/create:", err);
+        return res.status(500).json({ message: "Server error" });
     }
 });
 
-app.get("/rooms/create/:roomId/:userName", (req, res) => {
-    const roomId = req.params.roomId;
-    const userName = req.params.userName;
-    const existingRooms = roomManager.showRooms();
-    console.log("CREATE :: room :: ", roomId, " | username :: " , userName , " -:-",  existingRooms)
-    if (existingRooms.includes(roomId)) {
-        return res.status(409).json({ message: "Room already exists." });
-    } else {
-        return res.status(200).json({ message: "Room can be created." });
+// POST join - checks existence only (you can also use GET if you prefer)
+app.post("/rooms/join", (req, res) => {
+    try {
+        const { roomId, userName } = req.body;
+        if (!roomId || !userName) {
+            return res.status(400).json({ message: "roomId and userName required" });
+        }
+
+        const existingRooms = roomManager.showRooms();
+        console.log("JOIN attempt ::", roomId, "|", userName, "- existing:", existingRooms);
+
+        if (existingRooms.includes(roomId)) {
+            return res.status(200).json({ message: "Room exists, you can join." });
+        } else {
+            return res.status(404).json({ message: "Room does not exist." });
+        }
+    } catch (err) {
+        console.error("Error in /rooms/join:", err);
+        return res.status(500).json({ message: "Server error" });
     }
 });
+
 
 
 roomManager.setIO(io);

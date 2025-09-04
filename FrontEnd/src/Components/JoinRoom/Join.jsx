@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Join.css";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -23,9 +23,11 @@ const Home = () => {
 
     try {
       await axios.get(`${backendLink}/rooms/join/${room}/${userName}`);
+      console.log("Room :", room, " UserName : ", userName);
       sessionStorage.setItem("role", "regular");
       navigate(`/room?roomID=${room}&name=${userName}`);
-    } catch (err) {
+    } 
+    catch (err) {
       toast.error("No such room exists!", { autoClose: 1500 });
     }
   };
@@ -43,9 +45,11 @@ const Home = () => {
 
     try {
       await axios.get(`${backendLink}/rooms/create/${room}/${userName}`);
+      console.log("Room :", room, " UserName : ", userName);
       sessionStorage.setItem("role", "admin");
       navigate(`/room?roomID=${room}&name=${userName}`);
-    } catch (err) {
+    } 
+    catch (err) {
       toast.error("Room already exists!", { autoClose: 1500 });
     }
   };

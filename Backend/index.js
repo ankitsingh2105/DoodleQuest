@@ -303,6 +303,6 @@ app.get("/", (req, response) => {
 
 const PORT = 8000;
 server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`⚡⚡⚡⚡⚡⚡ Server running on port ${PORT} ⚡⚡⚡⚡⚡⚡`);
 
 });

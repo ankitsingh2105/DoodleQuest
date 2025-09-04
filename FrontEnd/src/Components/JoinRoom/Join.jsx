@@ -7,49 +7,46 @@ import backendLink from "../../../backendlink";
 
 const Home = () => {
   const navigate = useNavigate();
-  const [navLink, setNavLink] = useState("/");
 
   const handleJoinRoom = async () => {
     if (!userName) {
-        toast.error("Please enter your name to join a room!", {
-          autoClose: 1000,
-        });
-        return;
+      toast.error("Please enter your name to join a room!", {
+        autoClose: 1000,
+      });
+      return;
     }
 
     if (!room) {
-        toast.error("Please enter a room ID to join!", { autoClose: 1000 });
-        return;
+      toast.error("Please enter a room ID to join!", { autoClose: 1000 });
+      return;
     }
 
     try {
-        await axios.get(`${backendLink}/rooms/join/${room}/${userName}`);
-        sessionStorage.setItem("role", "regular");
-        navigate(`/room?roomID=${room}&name=${userName}`);
-    } 
-    catch (err) {
-        toast.error("No such room exists!", { autoClose: 1500 });
+      await axios.get(`${backendLink}/rooms/join/${room}/${userName}`);
+      sessionStorage.setItem("role", "regular");
+      navigate(`/room?roomID=${room}&name=${userName}`);
+    } catch (err) {
+      toast.error("No such room exists!", { autoClose: 1500 });
     }
   };
 
   const handleCreateRoom = async () => {
     if (!userName) {
-        toast.error("Please enter your name!", { autoClose: 1000 });
-        return;
+      toast.error("Please enter your name!", { autoClose: 1000 });
+      return;
     }
 
     if (!room) {
-        toast.error("Please enter a room ID!", { autoClose: 1000 });
-        return;
+      toast.error("Please enter a room ID!", { autoClose: 1000 });
+      return;
     }
 
     try {
-        await axios.get(`${backendLink}/rooms/create/${room}/${userName}`);
-        sessionStorage.setItem("role", "admin");
-        navigate(`/room?roomID=${room}&name=${userName}`);
-    } 
-    catch (err) {
-        toast.error("Room already exists!", { autoClose: 1500 });
+      await axios.get(`${backendLink}/rooms/create/${room}/${userName}`);
+      sessionStorage.setItem("role", "admin");
+      navigate(`/room?roomID=${room}&name=${userName}`);
+    } catch (err) {
+      toast.error("Room already exists!", { autoClose: 1500 });
     }
   };
 
@@ -76,7 +73,6 @@ const Home = () => {
       {/* Navigation */}
       <nav className="bg-white bg-opacity-90 backdrop-blur-sm shadow-md py-4 px-6 sticky top-0 z-50">
         <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
-          {/* Left: Logo + Title */}
           <div className="flex items-center gap-2">
             <svg
               className="w-8 sm:w-10 h-8 sm:h-10 text-indigo-600"
@@ -121,7 +117,7 @@ const Home = () => {
               your friends, show off your artistic skills, and have a blast!
             </p>
 
-            {/* Join Form */}
+            {/* Join / create Form */}
             <div className="bg-white p-6 rounded-xl shadow-md border-4 border-dashed border-indigo-500">
               <h3 className="text-xl font-bold text-indigo-800 mb-4">
                 Join a Game
@@ -156,44 +152,32 @@ const Home = () => {
                 </div>
                 <div className="flex gap-4">
                   <button
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        navigate(navLink);
-                      }
-                    }}
                     onClick={handleJoinRoom}
                     className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition shadow-md"
                   >
-                    <Link
+                    <div
                       style={{
                         textDecoration: "none",
                         color: "white",
                         fontFamily: "Courier New', Courier, monospace",
                       }}
-                      to={navLink}
                     >
                       Join Room
-                    </Link>
+                    </div>
                   </button>
                   <button
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        navigate(navLink);
-                      }
-                    }}
                     onClick={handleCreateRoom}
                     className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition shadow-md"
                   >
-                    <Link
+                    <div
                       style={{
                         textDecoration: "none",
                         color: "white",
                         fontFamily: "Courier New', Courier, monospace",
                       }}
-                      to={navLink}
                     >
                       Create Room
-                    </Link>
+                    </div>
                   </button>
                 </div>
               </div>

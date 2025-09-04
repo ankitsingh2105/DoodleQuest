@@ -108,8 +108,10 @@ const chatManager = new ChatManager(io, logger);
 
 app.get("/rooms/join/:roomId/:userName", (req, res) => {
     const roomId = req.params.roomId;
+    const userName = req.params.userName;
     const existingRooms = roomManager.showRooms();
     console.log("existingRooms for join : ", roomId, " :: " ,  existingRooms)
+    console.log("existingRooms for join room :: ", roomId, " | username :: ", fb8b40562d4f ,  existingRooms)
 
     if (existingRooms.includes(roomId)) {
         return res.status(200).json({ message: "Room exists, you can join." });
@@ -120,8 +122,9 @@ app.get("/rooms/join/:roomId/:userName", (req, res) => {
 
 app.get("/rooms/create/:roomId/:userName", (req, res) => {
     const roomId = req.params.roomId;
+    const userName = req.params.userName;
     const existingRooms = roomManager.showRooms();
-    console.log("existingRooms for create : ", roomId, " :: " ,  existingRooms)
+    console.log("existingRooms for create room :: ", roomId, " | username :: ", fb8b40562d4f ,  existingRooms)
     if (existingRooms.includes(roomId)) {
         return res.status(409).json({ message: "Room already exists." });
     } else {

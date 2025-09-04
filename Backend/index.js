@@ -124,7 +124,7 @@ app.get("/rooms/create/:roomId/:userName", (req, res) => {
     const roomId = req.params.roomId;
     const userName = req.params.userName;
     const existingRooms = roomManager.showRooms();
-    console.log("existingRooms for create room :: ", roomId, " | username :: ", fb8b40562d4f ,  existingRooms)
+    console.log("existingRooms for create room :: ", roomId, " | username :: " ,  existingRooms)
     if (existingRooms.includes(roomId)) {
         return res.status(409).json({ message: "Room already exists." });
     } else {

@@ -23,22 +23,11 @@ const Home = () => {
     }
 
     try {
-      let { data } = await axios.get(`${backendLink}/allRooms`);
-      let allRoomData = data.allRooms;
-      console.log("Join all rooms :: ", userName, " : ", allRoomData);
-
-      if (!allRoomData.includes(room)) {
-        toast.error("No such room exists, please create one", {
-          autoClose: 1500,
-        });
-        return;
-      }
-
+      await axios.get(`${backendLink}/rooms/join/${room}`);
       sessionStorage.setItem("role", "regular");
       navigate(`/room?roomID=${room}&name=${userName}`);
     } catch (err) {
-      toast.error("Error checking rooms", { autoClose: 1500 });
-      console.error(err);
+      toast.error("No such room exists!", { autoClose: 1500 });
     }
   };
 
@@ -54,21 +43,12 @@ const Home = () => {
     }
 
     try {
-      let { data } = await axios.get(`${backendLink}/allRooms`);
-      let allRoomData = data.allRooms;
-      console.log("Create all rooms :: ", userName, " : ", allRoomData);
-
-      if (allRoomData.includes(room)) {
-        toast.error("Room already exists", { autoClose: 1500 });
-        return;
-      }
-
+      await axios.get(`${backendLink}/rooms/create/${room}`);
       sessionStorage.setItem("role", "admin");
       navigate(`/room?roomID=${room}&name=${userName}`);
     } 
     catch (err) {
-      toast.error("Error checking rooms", { autoClose: 1500 });
-      console.error(err);
+      toast.error("Room already exists!", { autoClose: 1500 });
     }
   };
 

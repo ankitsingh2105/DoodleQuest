@@ -7,6 +7,8 @@ import backendLink from "../../../backendlink";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [userName, setuserName] = useState("");
+  const [room, setroom] = useState("");
 
   const handleJoinRoom = async () => {
     if (!userName) {
@@ -46,7 +48,7 @@ const Home = () => {
         userName,
       });
       console.log("Create Room Response:", res.status);
-      if (res.status === 200) {
+      if (res.status === 204) {
         sessionStorage.setItem("role", "admin");
         navigate(`/room?roomID=${room}&name=${userName}`);
       }
@@ -56,8 +58,6 @@ const Home = () => {
     }
   };
 
-  const [userName, setuserName] = useState("");
-  const [room, setroom] = useState("");
 
   const scrollToJoin = () => {
     const joinSection = document.getElementById("playerName");

@@ -169,6 +169,7 @@ io.on("connection", (socket) => {
     socket.on("join-room", (info) => {
         try {
             console.log("new user ::", info);
+            console.log("Room while i join", roomManager.showRooms());
             roomManager.joinRoom(socket, info);
         } catch (error) {
             logger.error(`Error in join-room event: ${error.message}`, { stack: error.stack });

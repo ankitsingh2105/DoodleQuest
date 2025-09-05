@@ -45,9 +45,8 @@ const Home = () => {
         roomId: room,
         userName,
       });
-
+      console.log("Create Room Response:", res.status);
       if (res.status === 200) {
-        // backend confirmed creation
         sessionStorage.setItem("role", "admin");
         navigate(`/room?roomID=${room}&name=${userName}`);
       }

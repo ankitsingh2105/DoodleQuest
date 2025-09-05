@@ -118,7 +118,6 @@ app.post("/rooms/create", (req, res) => {
         console.log("CREATE attempt ::", roomId, "|", userName, "- existing:", roomManager.showRooms());
         const existingRooms = roomManager.showRooms();
         if (existingRooms.includes(roomId)) {
-            console.log("Room already exists:", roomId);
             return res.status(409).json({ message: "Room already exists." });
         } 
         else {
@@ -167,6 +166,10 @@ io.on("connection", (socket) => {
     activeUsersGauge.inc();
 
     socket.on("join-room", (info) => {
+        const existingRooms = roomManager.showRooms();
+        if (info.role === "admin" && existingRooms.includes(info.room)) {
+            return;
+        } 
         try {
             console.log("new user ::", info);
             roomManager.joinRoom(socket, info);

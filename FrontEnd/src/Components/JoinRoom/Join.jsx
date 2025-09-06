@@ -22,17 +22,25 @@ const Home = () => {
       toast.error("Please enter a room ID to join!", { autoClose: 1000 });
       return;
     }
-
     try {
-      await axios.post(`${backendLink}/rooms/join`, {
-        roomId: room,
-        userName,
-      });
-      console.log("Room :", room, " UserName : ", userName);
-      sessionStorage.setItem("role", "regular");
-      navigate(`/room?roomID=${room}&name=${userName}`);
-    } catch (err) {
-      toast.error("No such room exists!", { autoClose: 1500 });
+        const response = await axios.get(`${backendLink}/allRooms`);
+        const existingRooms = response.data.rooms;
+        console.log("existingRooms :: " , existingRooms);
+        if (!existingRooms.includes(room)) {
+          toast.error("Room ID does not exist! Please check and try again.", {
+            autoClose: 1500,
+          });
+          return;
+        }
+        navigate(`/room?roomID=${room}&name=${userName}`);
+        sessionStorage.setItem("role", "player");
+    } 
+    catch (err) {
+        console.error("Error checking room existence:", err);
+        toast.error("Error checking room existence. Please try again.", {
+          autoClose: 1500,
+        });
+        return;
     }
   };
 
@@ -41,23 +49,26 @@ const Home = () => {
       toast.error("Please enter your name and room ID!", { autoClose: 1000 });
       return;
     }
-
     try {
-      const res = await axios.post(`${backendLink}/rooms/create`, {
-        roomId: room,
-        userName,
-      });
-      console.log("Create Room Response:", res.status);
-      if (res.status === 204) {
-        sessionStorage.setItem("role", "admin");
-        navigate(`/room?roomID=${room}&name=${userName}`);
+      const response = await axios.get(`${backendLink}/allRooms`);
+      const existingRooms = response.data.rooms;
+      console.log("existingRooms :: " , existingRooms);
+      if (existingRooms.includes(room)) {
+        toast.error("Room ID already taken! Please choose a different one.", {
+          autoClose: 1500,
+        });
+        return;
       }
+      navigate(`/room?roomID=${room}&name=${userName}`);
+      sessionStorage.setItem("role", "admin");
     } catch (err) {
-      // do NOT navigate on error
-      toast.error("Room already exists!", { autoClose: 1500 });
+      console.error("Error checking room existence:", err);
+      toast.error("Error checking room existence. Please try again.", {
+        autoClose: 1500,
+      });
+      return;
     }
   };
-
 
   const scrollToJoin = () => {
     const joinSection = document.getElementById("playerName");

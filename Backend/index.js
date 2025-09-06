@@ -107,56 +107,16 @@ app.get("/metrics", async (req, res) => {
 const roomManager = new RoomManager();
 const chatManager = new ChatManager(io, logger);
 
-// POST create - actually creates the room
-app.post("/rooms/create", (req, res) => {
-    try {
-        const { roomId, userName } = req.body;
-        if (!roomId || !userName) {
-            return res.status(400).json({ message: "roomId and userName required" });
-        }
-
-        console.log("CREATE attempt ::", roomId, "|", userName, "- existing:", roomManager.showRooms());
-        const existingRooms = roomManager.showRooms();
-        if (existingRooms.includes(roomId)) {
-            console.log("Room already exists:", roomId);
-            return res.status(409).json({ message: "Room already exists." });
-        } 
-        else {
-            console.log("Room can be created:", roomId);
-            return res.status(204).json({ message: "Room can be created." });
-        }
+app.get("/allRooms" , (req, response)=>{
+    try{
+        const rooms = roomManager.showRooms();
+        response.status(200).json({rooms});
     }
-    catch (err) {
-        console.error("Error in /rooms/create:", err);
-        return res.status(500).json({ message: "Server error" });
+    catch(error){
+        console.error("Error fetching rooms:", error);
+        response.status(500).json({message: "Failed to fetch rooms"});
     }
-});
-
-// POST join - checks existence only (you can also use GET if you prefer)
-app.post("/rooms/join", (req, res) => {
-    try {
-        const { roomId, userName } = req.body;
-        if (!roomId || !userName) {
-            return res.status(400).json({ message: "roomId and userName required" });
-        }
-
-        const existingRooms = roomManager.showRooms();
-        console.log("JOIN attempt ::", roomId, "|", userName, "- existing:", existingRooms);
-
-        if (existingRooms.includes(roomId)) {
-            return res.status(200).json({ message: "Room exists, you can join." });
-        }
-        else {
-            return res.status(409).json({ message: "Room does not exist." });
-        }
-    }
-    catch (err) {
-        console.error("Error in /rooms/join:", err);
-        return res.status(500).json({ message: "Server error" });
-    }
-});
-
-
+})
 
 roomManager.setIO(io);
 roomManager.setLogger(logger);

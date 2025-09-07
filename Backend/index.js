@@ -110,6 +110,7 @@ const chatManager = new ChatManager(io, logger);
 app.get("/allRooms" , (req, response)=>{
     try{
         const rooms = roomManager.showRooms();
+        console.log("ALL ROOMS IN BACKEND :: " , rooms);
         response.status(200).json({rooms});
     }
     catch(error){

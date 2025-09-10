@@ -223,8 +223,8 @@ export default function InfoBar(props) {
 
       {/* infobar */}
 
-      <div className="flex flex-row items-center justify-around gap-90 p-0.5">
-        <section className="flex text-xl font-bold text-indigo-600 w-12">
+      <div className="flex flex-col sm:flex-row items-center justify-around gap-5 md:gap-80 p-0.5">
+        <section className="flex text-xl font-bold text-indigo-600 items-center">
           <div className='mr-3 text-pink-500'>
             DrawTime
           </div>
@@ -268,12 +268,12 @@ export default function InfoBar(props) {
 
       {/* Admin controls */}
 
-      <div className={`flex flex-row items-center justify-around gap-40 p-4 rounded-2xl mt-3 w-full ${role != "admin" ? "hidden" : "bg-pink-100"} `}>
-        <section className="flex flex-row items-center justify-around text-blue-600">
+      <div className={`flex flex-col sm:flex-row items-center justify-around p-4 rounded-2xl mt-3 w-full ${role != "admin" ? "hidden" : "bg-pink-100"} gap-5 md:gap-30`}>
+        <section className="text-blue-600">
           Admin Controls
         </section>
 
-        <section className="flex justify-center items-center">
+        <section className="flex justify-center items-center gap-1">
           <div className='mr-3 text-pink-500 font-bold'>
             Set draw time
           </div>

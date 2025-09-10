@@ -328,7 +328,7 @@ export default function Playground() {
                     {/*todo : Drawing Canvas */}
                     <section className="flex-1 flex flex-col items-center bg-white rounded-2xl shadow-lg p-6">
                         <canvas
-                            width="600px"
+                            width={window.innerWidth <=400 ? 400 : 600}
                             height="450px"
                             ref={canvasRef}
                             onMouseDown={startDrawing}

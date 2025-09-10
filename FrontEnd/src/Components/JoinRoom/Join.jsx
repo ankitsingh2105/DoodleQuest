@@ -90,7 +90,7 @@ const Home = () => {
       <ToastContainer />
 
       {/* Navigation */}
-      <nav className="bg-white bg-opacity-90 backdrop-blur-sm shadow-md py-4 px-6 sticky top-0 z-50">
+      <nav className="bg-white bg-opacity-90 shadow-md py-4 px-6 sticky top-0 z-50">
         <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
           <div className="flex items-center gap-2">
             <svg
@@ -241,7 +241,7 @@ const Home = () => {
                 </div>
               </div>
             </div>
-            <div className="absolute -bottom-6 -right-6 bg-yellow-400 w-20 h-20 rounded-full flex items-center justify-center text-4xl rotate-12 shadow-lg">
+            <div className="absolute -bottom-10 -right-2 bg-yellow-400 w-20 h-20 rounded-full flex items-center justify-center text-4xl rotate-12 shadow-lg">
               🎨
             </div>
           </div>

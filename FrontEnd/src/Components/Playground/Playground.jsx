@@ -64,7 +64,7 @@ export default function Playground() {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve();
-            }, 2000);
+            }, 5000);
         })
     }
 
@@ -72,7 +72,7 @@ export default function Playground() {
         if (targetSocketID !== playerIDRef.current) {
             return;
         }
-        toast.info("You will be removed by the admin in 2 second", { autoClose: 2000 });
+        toast.info("You will be removed by the admin in 5 second", { autoClose: 5000 });
         await kickUserInFiveSeconds();
         navigate("/");
     }
@@ -206,7 +206,8 @@ export default function Playground() {
     // * called on onMouseMove event
     const draw = ({ nativeEvent }) => {
         if (!isDrawing) return;
-
+        // e is synthetic event, nativeEvent is the real event
+        // nativeEvent is the real event, it has offsetX and offsetY properties
         const { offsetX, offsetY } = nativeEvent;
 
         const context = contextRef.current;

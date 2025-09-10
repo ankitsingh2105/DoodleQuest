@@ -23,7 +23,7 @@ const Home = () => {
       return;
     }
     try {
-        const response = await axios.get(`${backendLink}/allRooms`);
+        const response = await axios.get(`${backendLink}/allRooms?roomID=${room}`);
         const existingRooms = response.data.rooms;
         console.log("existingRooms :: " , existingRooms);
         if (!existingRooms.includes(room)) {
@@ -50,15 +50,17 @@ const Home = () => {
       return;
     }
     try {
-      const response = await axios.get(`${backendLink}/allRooms`);
+      const response = await axios.get(`${backendLink}/allRooms?roomID=${room}`);
       const existingRooms = response.data.rooms;
       console.log("existingRooms :: " , existingRooms);
+      console.log("My response :: " , response);
       if (existingRooms.includes(room)) {
         toast.error("Room ID already taken! Please choose a different one.", {
           autoClose: 1500,
         });
         return;
       }
+      console.log("I am going to navigate");
       navigate(`/room?roomID=${room}&name=${userName}`);
       sessionStorage.setItem("role", "admin");
     } catch (err) {

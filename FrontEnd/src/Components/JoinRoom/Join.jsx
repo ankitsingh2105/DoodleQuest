@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Join.css";
 import axios from "axios";
@@ -7,8 +7,30 @@ import backendLink from "../../../backendlink";
 
 const Home = () => {
   const navigate = useNavigate();
-  const [userName, setuserName] = useState("");
+  const [userName, setuserName] = useState();
   const [room, setroom] = useState("");
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    async function checkAuth() {
+      try {
+        const res = await axios.get(`${backendLink}/users/status`, {
+          withCredentials: true, // send cookies
+        });
+
+        console.log("Auth check response:", res.data);
+
+        setUser(res.data.user);
+        setuserName(res.data.user);
+      } 
+      catch (err) {
+        console.error("Auth check failed:", err);
+        setUser(null);
+      }
+    }
+
+    checkAuth();
+  }, []);
 
   const handleJoinRoom = async () => {
     if (!userName) {
@@ -23,24 +45,25 @@ const Home = () => {
       return;
     }
     try {
-        const response = await axios.get(`${backendLink}/allRooms?roomID=${room}`);
-        const existingRooms = response.data.rooms;
-        console.log("existingRooms :: " , existingRooms);
-        if (!existingRooms.includes(room)) {
-          toast.error("Room ID does not exist! Please check and try again.", {
-            autoClose: 1500,
-          });
-          return;
-        }
-        navigate(`/room?roomID=${room}&name=${userName}`);
-        sessionStorage.setItem("role", "player");
-    } 
-    catch (err) {
-        console.error("Error checking room existence:", err);
-        toast.error("Error checking room existence. Please try again.", {
+      const response = await axios.get(
+        `${backendLink}/allRooms?roomID=${room}`
+      );
+      const existingRooms = response.data.rooms;
+      console.log("existingRooms :: ", existingRooms);
+      if (!existingRooms.includes(room)) {
+        toast.error("Room ID does not exist! Please check and try again.", {
           autoClose: 1500,
         });
         return;
+      }
+      navigate(`/room?roomID=${room}&name=${userName}`);
+      sessionStorage.setItem("role", "player");
+    } catch (err) {
+      console.error("Error checking room existence:", err);
+      toast.error("Error checking room existence. Please try again.", {
+        autoClose: 1500,
+      });
+      return;
     }
   };
 
@@ -50,10 +73,12 @@ const Home = () => {
       return;
     }
     try {
-      const response = await axios.get(`${backendLink}/allRooms?roomID=${room}`);
+      const response = await axios.get(
+        `${backendLink}/allRooms?roomID=${room}`
+      );
       const existingRooms = response.data.rooms;
-      console.log("existingRooms :: " , existingRooms);
-      console.log("My response :: " , response);
+      console.log("existingRooms :: ", existingRooms);
+      console.log("My response :: ", response);
       if (existingRooms.includes(room)) {
         toast.error("Room ID already taken! Please choose a different one.", {
           autoClose: 1500,
@@ -70,12 +95,6 @@ const Home = () => {
       });
       return;
     }
-  };
-
-  const scrollToJoin = () => {
-    const joinSection = document.getElementById("playerName");
-    joinSection.scrollIntoView({ behavior: "smooth" });
-    joinSection.focus();
   };
 
   return (
@@ -118,6 +137,34 @@ const Home = () => {
             >
               Game by Ankit Chauhan
             </a>
+            {user ? (
+              <>
+                <button
+                  onClick={() => navigate(`/dashboard/${user.userId}`)}
+                  className="ml-4 text-indigo-600 font-bold p-1 pl-2 pr-2 rounded-2xl hover:cursor-pointer"
+                >
+                  Welcome {user.userName}
+                </button>
+                <button className="text-indigo-600 font-bold p-1 pl-2 pr-2 rounded-2xl hover:cursor-pointer">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => navigate("/login")}
+                  className="ml-4 text-indigo-600 font-bold p-1 pl-2 pr-2 rounded-2xl hover:cursor-pointer"
+                >
+                  Login
+                </button>
+                <button
+                  onClick={() => navigate("/signup")}
+                  className="ml-4 text-indigo-600 font-bold p-1 pl-2 pr-2 rounded-2xl hover:cursor-pointer"
+                >
+                  Signup
+                </button>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -300,10 +347,7 @@ const Home = () => {
             name, create a room, and start playing now!
           </p>
           <div className="flex justify-center">
-            <button
-              onClick={scrollToJoin}
-              className="px-8 py-4 bg-white text-indigo-600 font-bold rounded-full text-lg hover:bg-gray-100 transition shadow-lg"
-            >
+            <button className="px-8 py-4 bg-white text-indigo-600 font-bold rounded-full text-lg hover:bg-gray-100 transition shadow-lg">
               JOIN NOW!
             </button>
           </div>

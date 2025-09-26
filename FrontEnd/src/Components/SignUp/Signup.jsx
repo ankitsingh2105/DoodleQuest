@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
 import backendLink from "../../../backendlink";
 import { useNavigate } from "react-router-dom";
@@ -21,11 +22,17 @@ export default function Signup() {
       return;
     }
     try {
-      const { data } = await axios.post(`${backendLink}/login`, {
-        userName,
-        email,
-        password,
-      });
+      const { data } = await axios.post(
+        `${backendLink}/signup`,
+        {
+          userName,
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
       sessionStorage.setItem(
         "user",
         JSON.stringify(data.user || { userName, email })
@@ -33,6 +40,7 @@ export default function Signup() {
       toast.success("Account created! Redirecting...", { autoClose: 1200 });
       navigate("/");
     } catch (err) {
+      console.log(err);
       toast.error("Signup failed. Please try again.", { autoClose: 1500 });
     }
   };

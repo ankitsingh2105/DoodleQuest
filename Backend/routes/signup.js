@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../config/mysqlconfig");
+const jwt = require("jsonwebtoken");
+const JWT_SECRET = "doodlequestsecret";
 
 router.post("/", async (req, res) => {
     const { userName, email, password } = req.body;
@@ -8,21 +10,31 @@ router.post("/", async (req, res) => {
     const connection = await db();
     try {
         const [existingUser] = await connection.execute(
-            'SELECT * FROM users WHERE email = ?',  
+            'SELECT * FROM users WHERE email = ?',
             [email]
         );
         if (existingUser.length > 0) {
             await connection.end();
             return res.status(409).json({ message: "Email already in use" });
         }
-        const [result] = await connection.execute(
+        const [user] = await connection.execute(
             'INSERT INTO users (userName, email, password) VALUES (?, ?, ?)',
             [userName, email, password]
         );
         await connection.end();
-        res.status(201).json({ message: "User registered successfully", userId: result.insertId });
+
+        const payload = { userId: user.user_id, userName: user.userName };
+        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "2h" });
+
+        res.cookie("doodlequesttoken", token, {
+            secure: false,
+            httpOnly: true,
+            sameSite: 'lax',
+            maxAge: 2 * 60 * 60 * 1000
+        });
+        res.status(201).json({ message: "User registered successfully", userId: user.insertId });
     }
-    catch (error) { 
+    catch (error) {
         console.error("Error during signup:", error);
         res.status(500).json({ message: "Internal server error" });
     }

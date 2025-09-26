@@ -138,10 +138,11 @@ io.on("connection", (socket) => {
         try {
             console.log("new user ::", info);
             console.log("Room while i join", roomManager.showRooms());
+            // socket.emit("playerId")
             roomManager.joinRoom(socket, info);
-        } catch (error) {
+        } 
+        catch (error) {
             logger.error(`Error in join-room event: ${error.message}`, { stack: error.stack });
-            socket.emit("error", { message: "Failed to join room" });
         }
     });
 

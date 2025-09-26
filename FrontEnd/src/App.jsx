@@ -16,7 +16,7 @@ export default function App() {
             <Route path="/room" element={<Main />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} /> 
-            <Route path="/dashboard/:userId" element={<Dashboard />} /> 
+            <Route path="/dashboard/:userName" element={<Dashboard />} /> 
           </Routes>
         </BrowserRouter>
       </main>

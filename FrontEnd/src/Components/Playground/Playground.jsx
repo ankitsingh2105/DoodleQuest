@@ -118,6 +118,7 @@ export default function Playground() {
         const handleNewPlayer = async ({ room, name, playerSocketID }) => {
             if (!playerIDRef.current) {
                 setPlayerID(playerSocketID);
+                playerIDRef.current = playerSocketID;
             }
         }
         const waitForSomeTimeForScoreBoard = () => {
@@ -321,7 +322,7 @@ export default function Playground() {
 
                     {/* Player List */}
                     <section className="flex-1 bg-white rounded-2xl shadow-lg p-4">
-                        <Players name={name} room={room} socket={socket.current} playerList={players} />
+                        <Players name={name} room={room} socket={socket.current} playerList={players} playerSocketId = {playerIDRef.current} />
                     </section>
 
 

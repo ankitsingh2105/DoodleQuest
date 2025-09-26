@@ -12,7 +12,7 @@ router.post("/", async (req, res) => {
     try {
         const [rows] = await connection.execute(
             "SELECT user_id, userName, password FROM users WHERE userName = ?",
-            [userName]
+            [userName] 
         );
         await connection.end();
 

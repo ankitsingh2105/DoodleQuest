@@ -30,7 +30,8 @@ export default function Login() {
       sessionStorage.setItem("user", JSON.stringify(data.user || { userName }));
       toast.success(`Welcome back, ${userName}!`, { autoClose: 1000 });
       navigate("/");
-    } catch (err) {
+    } 
+    catch (err) {
       toast.error("Login failed. Please try again.", { autoClose: 1500 });
     }
   };

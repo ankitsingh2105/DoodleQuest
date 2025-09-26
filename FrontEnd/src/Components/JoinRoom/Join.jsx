@@ -15,15 +15,14 @@ const Home = () => {
     async function checkAuth() {
       try {
         const res = await axios.get(`${backendLink}/users/status`, {
-          withCredentials: true, // send cookies
+          withCredentials: true,
         });
 
         console.log("Auth check response:", res.data);
 
-        setUser(res.data.user);
-        setuserName(res.data.user);
-      } 
-      catch (err) {
+        setUser(res.data.userName);
+        setuserName(res.data.userName);
+      } catch (err) {
         console.error("Auth check failed:", err);
         setUser(null);
       }
@@ -56,6 +55,22 @@ const Home = () => {
         });
         return;
       }
+      try {
+        await axios.post(
+          `${backendLink}/users/addGame`,
+          {
+            userName,
+            role: "normal player",
+            room_id: room,
+          },
+          {
+            withCredentials: true,
+          }
+        );
+      } 
+      catch (error) {
+        console.log(error);
+      }
       navigate(`/room?roomID=${room}&name=${userName}`);
       sessionStorage.setItem("role", "player");
     } catch (err) {
@@ -85,7 +100,21 @@ const Home = () => {
         });
         return;
       }
-      console.log("I am going to navigate");
+      try {
+        await axios.post(
+          `${backendLink}/users/addGame`,
+          {
+            userName,
+            role: "admin",
+            room_id: room,
+          },
+          {
+            withCredentials: true,
+          }
+        );
+      } catch (error) {
+        console.log(error);
+      }
       navigate(`/room?roomID=${room}&name=${userName}`);
       sessionStorage.setItem("role", "admin");
     } catch (err) {
@@ -140,10 +169,10 @@ const Home = () => {
             {user ? (
               <>
                 <button
-                  onClick={() => navigate(`/dashboard/${user.userId}`)}
-                  className="ml-4 text-indigo-600 font-bold p-1 pl-2 pr-2 rounded-2xl hover:cursor-pointer"
+                  onClick={() => navigate(`/dashboard/${user}`)}
+                  className="ml-4 text-indigo-600 font-bold p-1 pl-2 pr-2 rounded-2xl hover:cursor-pointer underline"
                 >
-                  Welcome {user.userName}
+                  Welcome {user}
                 </button>
                 <button className="text-indigo-600 font-bold p-1 pl-2 pr-2 rounded-2xl hover:cursor-pointer">
                   Logout
@@ -189,21 +218,6 @@ const Home = () => {
                 Join a Game
               </h3>
               <div className="space-y-4">
-                <div>
-                  <label
-                    className="block text-gray-700 mb-2"
-                    htmlFor="playerName"
-                  >
-                    Your Name
-                  </label>
-                  <input
-                    onChange={(event) => setuserName(event.target.value)}
-                    type="text"
-                    id="playerName"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Enter your name"
-                  />
-                </div>
                 <div>
                   <label className="block text-gray-700 mb-2" htmlFor="roomId">
                     Room ID

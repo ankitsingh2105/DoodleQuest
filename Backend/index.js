@@ -10,6 +10,11 @@ const { createLogger, format } = require("winston");
 const LokiTransport = require("winston-loki");
 const RoomManager = require("./Components/RoomManger");
 const ChatManager = require("./Components/ChatManager");
+const userRoutes = require("./routes/useRoutes");    
+const loginRoutes = require("./routes/login");
+const signupRoutes = require("./routes/signup");
+const cookieParser = require('cookie-parser');
+
 
 dotenv.config();
 const server = http.createServer(app);
@@ -25,9 +30,13 @@ const corsOptions = {
     credentials: true,
 };
 
-
+app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use("/users", userRoutes);
+app.use("/login", loginRoutes);
+app.use("/signup", signupRoutes);
+
 
 const io = new Server(server, {
     cors: {
@@ -110,11 +119,9 @@ const chatManager = new ChatManager(io, logger);
 app.get("/allRooms" , (req, response)=>{
     try{
         const rooms = roomManager.showRooms();
-        console.log("ALL ROOMS IN BACKEND :: " , rooms);
         response.status(200).json({rooms});
     }
     catch(error){
-        console.error("Error fetching rooms:", error);
         response.status(500).json({message: "Failed to fetch rooms"});
     }
 })
@@ -131,10 +138,11 @@ io.on("connection", (socket) => {
         try {
             console.log("new user ::", info);
             console.log("Room while i join", roomManager.showRooms());
+            // socket.emit("playerId")
             roomManager.joinRoom(socket, info);
-        } catch (error) {
+        } 
+        catch (error) {
             logger.error(`Error in join-room event: ${error.message}`, { stack: error.stack });
-            socket.emit("error", { message: "Failed to join room" });
         }
     });
 

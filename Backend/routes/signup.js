@@ -29,7 +29,7 @@ router.post("/", async (req, res) => {
         res.cookie("doodlequesttoken", token, {
             secure: true,
             sameSite: "none",
-            maxAge:r 2 * 60 * 60 * 1000
+            maxAge: 2 * 60 * 60 * 1000
         });  
 
         res.status(200).json({

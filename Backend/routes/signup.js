@@ -27,11 +27,11 @@ router.post("/", async (req, res) => {
         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "2h" });
 
         res.cookie("doodlequesttoken", token, {
-            secure: false,
-            httpOnly: true,
-            sameSite: 'lax',
-            maxAge: 2 * 60 * 60 * 1000
-        });
+            secure: true,
+            sameSite: "none",
+            maxAge:r 2 * 60 * 60 * 1000
+        });  
+
         res.status(200).json({
             message: "Signup successful",
             token,

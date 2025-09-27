@@ -23,7 +23,7 @@ router.post("/", async (req, res) => {
         );
         await connection.end();
 
-        const payload = { userId: user.user_id, userName: user.userName };
+        const payload = { userName: userName };
         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "2h" });
 
         res.cookie("doodlequesttoken", token, {
@@ -32,7 +32,11 @@ router.post("/", async (req, res) => {
             sameSite: 'lax',
             maxAge: 2 * 60 * 60 * 1000
         });
-        res.status(201).json({ message: "User registered successfully", userId: user.insertId });
+        res.status(200).json({
+            message: "Signup successful",
+            token,
+            user: { userId: user.user_id, userName: user.userName }
+        });
     }
     catch (error) {
         console.error("Error during signup:", error);

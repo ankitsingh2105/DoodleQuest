@@ -5,6 +5,7 @@ import Main from './Components/Playground/Playground';
 import Login from './Components/Login/Login';
 import Signup from './Components/SignUp/Signup';  
 import Dashboard from './Components/Dashboard/Dashboard';
+import PublicProfile from './Components/PublicProfile/PublicProfile';
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} /> 
             <Route path="/dashboard/:userName" element={<Dashboard />} /> 
+            <Route path="/:userName" element={<PublicProfile />} /> 
           </Routes>
         </BrowserRouter>
       </main>

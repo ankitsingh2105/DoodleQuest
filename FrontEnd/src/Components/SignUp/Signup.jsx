@@ -53,7 +53,7 @@ export default function Signup() {
         <div className="space-y-4">
           <input
             type="text"
-            placeholder="Display Name"
+            placeholder="username"
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -81,7 +81,7 @@ export default function Signup() {
           />
           <button
             onClick={handleSignup}
-            className="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition"
+            className="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 hover:cursor-pointer"
           >
             Sign Up
           </button>

@@ -18,12 +18,10 @@ const Home = () => {
           withCredentials: true,
         });
 
-        console.log("Auth check response:", res.data);
-
         setUser(res.data.userName);
         setuserName(res.data.userName);
-      } catch (err) {
-        console.error("Auth check failed:", err);
+      } 
+      catch (err) {
         setUser(null);
       }
     }
@@ -33,7 +31,7 @@ const Home = () => {
 
   const handleJoinRoom = async () => {
     if (!userName) {
-      toast.error("Please enter your name to join a room!", {
+      toast.info("Please login first", {
         autoClose: 1000,
       });
       return;
@@ -48,7 +46,6 @@ const Home = () => {
         `${backendLink}/allRooms?roomID=${room}`
       );
       const existingRooms = response.data.rooms;
-      console.log("existingRooms :: ", existingRooms);
       if (!existingRooms.includes(room)) {
         toast.error("Room ID does not exist! Please check and try again.", {
           autoClose: 1500,
@@ -67,14 +64,12 @@ const Home = () => {
             withCredentials: true,
           }
         );
-      } 
-      catch (error) {
-        console.log(error);
+      } catch (error) {
+        // console.log(error);
       }
       navigate(`/room?roomID=${room}&name=${userName}`);
       sessionStorage.setItem("role", "player");
     } catch (err) {
-      console.error("Error checking room existence:", err);
       toast.error("Error checking room existence. Please try again.", {
         autoClose: 1500,
       });
@@ -83,8 +78,15 @@ const Home = () => {
   };
 
   const handleCreateRoom = async () => {
-    if (!userName || !room) {
-      toast.error("Please enter your name and room ID!", { autoClose: 1000 });
+    if (!userName) {
+      toast.info("Please login first", {
+        autoClose: 1000,
+      });
+      return;
+    }
+
+    if (!room) {
+      toast.error("Please enter a room ID to join!", { autoClose: 1000 });
       return;
     }
     try {
@@ -92,8 +94,6 @@ const Home = () => {
         `${backendLink}/allRooms?roomID=${room}`
       );
       const existingRooms = response.data.rooms;
-      console.log("existingRooms :: ", existingRooms);
-      console.log("My response :: ", response);
       if (existingRooms.includes(room)) {
         toast.error("Room ID already taken! Please choose a different one.", {
           autoClose: 1500,
@@ -113,12 +113,11 @@ const Home = () => {
           }
         );
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
       navigate(`/room?roomID=${room}&name=${userName}`);
       sessionStorage.setItem("role", "admin");
     } catch (err) {
-      console.error("Error checking room existence:", err);
       toast.error("Error checking room existence. Please try again.", {
         autoClose: 1500,
       });
@@ -126,27 +125,31 @@ const Home = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        `${backendLink}/users/logout`,
+        {},
+        { withCredentials: true }
+      );
+      window.location.reload();
+    } catch (err) {
+      toast.error("Logout failed. Please try again.", { autoClose: 1000 });
+    }
+  };
+
   return (
-    <div
-      style={{
-        transform: "scale(0.9)",
-        transformOrigin: "top left",
-        width: "111.11%",
-      }}
-      className="bg-blue-50"
-    >
+    <div className="bg-blue-50">
       <ToastContainer />
 
       {/* Navigation */}
-      <nav className="bg-white bg-opacity-90 shadow-md py-4 px-6 sticky top-0 z-50">
+      <nav className="bg-white shadow-md py-4 px-6 sticky top-0 z-50">
         <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
           <div className="flex items-center gap-2">
             <svg
               className="w-8 sm:w-10 h-8 sm:h-10 text-indigo-600"
               fill="currentColor"
               viewBox="0 0 24 24"
-              role="img"
-              aria-label="DoodleQuest logo"
             >
               <path d="M8.5,3A5.5,5.5 0 0,1 14,8.5C14,9.83 13.53,11.05 12.74,12H21V21H12V12.74C11.05,13.53 9.83,14 8.5,14A5.5,5.5 0 0,1 3,8.5A5.5,5.5 0 0,1 8.5,3M8.5,5A3.5,3.5 0 0,0 5,8.5A3.5,3.5 0 0,0 8.5,12A3.5,3.5 0 0,0 12,8.5A3.5,3.5 0 0,0 8.5,5Z" />
             </svg>
@@ -174,7 +177,10 @@ const Home = () => {
                 >
                   Welcome {user}
                 </button>
-                <button className="text-indigo-600 font-bold p-1 pl-2 pr-2 rounded-2xl hover:cursor-pointer">
+                <button
+                  onClick={handleLogout}
+                  className="text-indigo-600 font-bold p-1 pl-2 pr-2 rounded-2xl hover:cursor-pointer"
+                >
                   Logout
                 </button>
               </>

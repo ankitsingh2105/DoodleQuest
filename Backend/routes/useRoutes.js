@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../config/mysqlconfig");
-const requireAuth = require('../middleware/authMiddleWare');
+const authMiddleWare = require('../middleware/authMiddleWare');
 
-router.get("/details/:userName", requireAuth, async (req, response) => {
+router.get("/details/:userName", async (req, response) => {
     const connection = await db();
     const { userName } = req.params;
     console.log("Fetching details for user:", userName);
@@ -24,7 +24,7 @@ router.get("/details/:userName", requireAuth, async (req, response) => {
     }
 })
 
-router.get("/gamesPlayed/:userName", requireAuth, async (req, response) => {
+router.get("/gamesPlayed/:userName", async (req, response) => {
     const connection = await db();
     const { userName } = req.params;
     try {
@@ -43,7 +43,7 @@ router.get("/gamesPlayed/:userName", requireAuth, async (req, response) => {
     }
 }); 
 
-router.post("/addGame", requireAuth, async (req, response) => {
+router.post("/addGame", authMiddleWare, async (req, response) => {
     const connection = await db();
     const { userName, room_id, role } = req.body;
     console.log(userName, room_id, role);
@@ -63,7 +63,7 @@ router.post("/addGame", requireAuth, async (req, response) => {
     }
 }); 
 
-router.get("/status", requireAuth, (req, res) => {
+router.get("/status", authMiddleWare, (req, res) => {
     try {
         console.log("Authenticated user:", req.user);
         res.status(200).json({ message: 'User is authenticated', userName: req.user.userName });
@@ -74,7 +74,7 @@ router.get("/status", requireAuth, (req, res) => {
     }
 });
  
-router.put("/updateAvatar/:userName", requireAuth, async (req, response) => {
+router.put("/updateAvatar/:userName", authMiddleWare, async (req, response) => {
     const connection = await db();
     const { userName } = req.params;
     const { profile_photo_url } = req.body;
@@ -120,5 +120,36 @@ router.post("/follow", async (req, response)=>{
         })
     }
 })
+
+router.get("/followers/:userName", async (req, response)=>{
+    const connection = await db();
+    const { userName } = req.params;
+    console.log(" ::>>>>>>>>>>>>>>>>>>>>>> ",  userName);
+    try {
+        const [rows] = await connection.execute(`
+            select follower_userName, followed_at
+            from followers
+            where followee_userName = ?  
+        `, [userName]);
+        console.log(rows);
+        await connection.end();
+        return response.status(200).send({
+            messgae: "Found followers",
+            followers : rows
+        });
+    }
+    catch (error) {
+        console.log("Error Following:", error);
+        response.status(404).send({
+            message: "Something went wrong"
+        })
+    }
+})
+
+router.post('/logout', authMiddleWare ,(req, res) => {
+  res.clearCookie('doodlequesttoken', { httpOnly: true, path: '/' });
+  return res.json({ ok: true, message: 'Logged out (cookie cleared)' });
+});
+
 
 module.exports = router

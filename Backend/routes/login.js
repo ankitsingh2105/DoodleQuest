@@ -15,13 +15,13 @@ router.post("/", async (req, res) => {
             [userName] 
         );
         await connection.end();
-
+        console.log("Database query result:", rows);
         if (rows.length === 0) {
             return res.status(401).json({ message: "Invalid username or password" });
         }
 
         const user = rows[0];
-
+        console.log("User found:", user);
         if (user.password !== password) {
             return res.status(401).json({ message: "Invalid username or password" });
         }  
@@ -31,9 +31,8 @@ router.post("/", async (req, res) => {
         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "2h" });
 
         res.cookie("doodlequesttoken", token, {
-            secure: false,
-            httpOnly: true, 
-            sameSite: 'lax',
+            secure: true,
+            sameSite: "none",
             maxAge: 2 * 60 * 60 * 1000
         });  
 

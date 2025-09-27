@@ -69,14 +69,14 @@ export default function PublicProfile() {
     fetchGamesPlayed();
   }, [user]);
 
-  if (loading) return <div className="text-center mt-10">Loading...</div>;
+  if (loading) return <div className="text-center mt-10 text-pink-500 font-extrabold">Loading...</div>;
 
   return (
     <div className="p-2 md:p-6 max-w-6xl mx-auto space-y-8">
       <ToastContainer />
 
       {/* Navigation */}
-      <nav className="bg-white bg-opacity-90 shadow-md sticky top-0 z-5000 p-2">
+      <nav className="bg-white bg-opacity-90 shadow-md sticky top-0 z-5000 p-2 mt-[-40px]">
         <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
           <div className="flex items-center gap-2">
             <svg
@@ -124,10 +124,10 @@ export default function PublicProfile() {
               </div>
             </section>
             <h2 className="text-3xl font-bold text-indigo-800 mb-4">
-              Welcome, {user.userName}!
+              Welcome to my profile, I am {user.userName}
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-2 gap-4 text-sm">
             <p>
               <strong>Email:</strong> {user.email}
             </p>
@@ -147,7 +147,7 @@ export default function PublicProfile() {
       {/* Follower table */}
       <div className="p-4 border border-pink-500 rounded-lg shadow-md">
         <h3 className="text-2xl font-bold text-indigo-600 mb-4">
-          People following you
+          People following {userName}
         </h3>
         {followers.length === 0 ? (
           <p>No followers yet.</p>
@@ -163,7 +163,7 @@ export default function PublicProfile() {
             <tbody>
               {followers.map((follower) => (
                 <tr
-                  key={follower.follower_userName}
+                  key={follower.follower_userName} 
                   className="hover:bg-pink-50"
                 >
                   <td className="text-indigo-600 font-bold p-2 border-b border-pink-200">
@@ -173,7 +173,7 @@ export default function PublicProfile() {
                     <a
                       href={`https://doodlequest.games/${follower.follower_userName}`}
                     >
-                      {`${follower.follower_userName}'s profile`}{" "}
+                      Link
                     </a>
                   </td>
                   <td className="p-2 border-b border-pink-200">
@@ -189,7 +189,7 @@ export default function PublicProfile() {
       {/* Admin Games Table */}
       <div className="p-4 border border-pink-500 rounded-lg shadow-md">
         <h3 className="text-2xl font-bold text-indigo-600 mb-4">
-          Games You Created
+          Games {userName} Created
         </h3>
         {adminGames.length === 0 ? (
           <p>No games created yet.</p>
@@ -220,7 +220,7 @@ export default function PublicProfile() {
       {/* Games Played Table */}
       <div className="p-4 border border-pink-500 rounded-lg shadow-md">
         <h3 className="text-2xl font-bold text-indigo-600 mb-4">
-          Games You Played
+          Games {userName} Played
         </h3>
         {gamesPlayed.length === 0 ? (
           <p>No games played yet.</p>

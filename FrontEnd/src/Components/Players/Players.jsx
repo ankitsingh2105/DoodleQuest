@@ -2,6 +2,7 @@ import { LogOut } from "lucide-react";
 import axios from "axios";
 import {toast, ToastContainer} from "react-toastify";
 import backendLink from "../../../backendlink";
+import { useEffect } from "react";
 
 export default function Players({ name, room, playerList, socket, playerSocketId }) {
   const emojis = [
@@ -19,21 +20,30 @@ export default function Players({ name, room, playerList, socket, playerSocketId
     socket.emit("kickUser", { room, socketID });
   };
 
+  let myFollowers = [];
+
   const handleFollowing = async (userName) =>{
-    console.log(userName);
     try{
       await axios.post(`${backendLink}/users/follow`, { userName, name }, { withCredentials: true });
+      socket.emit("followUser", {"follower" : name, "followee" : userName, room});
       toast.success(`You are now following ${userName}`, {autoClose : 1200});
     }
     catch(error){
-      console.log(error);
       toast.error(`Already following ${userName}`, {autoClose : 1200});
     }
   }
 
-  console.log(playerList);
-  console.log(playerSocketId);
-  console.log(name);
+  useEffect(()=>{
+    socket.on("someOneFollowed", ({follower, followee})=>{
+      if(followee === name && myFollowers.includes(follower) === false){
+        toast.success(`${follower} followed you`, {autoClose : 1200});
+        myFollowers.push(follower);
+      }
+    })
+    return () =>{
+      socket.off("someOneFollowed");
+    }
+  },[socket])
 
   return (
     <div className="flex flex-col h-full border-4 rounded-2xl border-dashed border-pink-400  shadow-md bg-white">

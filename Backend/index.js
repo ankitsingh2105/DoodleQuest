@@ -34,6 +34,7 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/users", userRoutes);
+console.log(userRoutes)
 app.use("/login", loginRoutes);
 app.use("/signup", signupRoutes);
 
@@ -46,7 +47,7 @@ const io = new Server(server, {
             "https://www.doodlequest.vercel.app",
             "https://doodlequest.games",
             "https://www.doodlequest.games"
-        ],
+        ], 
         credentials: true,
     },
 });
@@ -225,7 +226,8 @@ io.on("connection", (socket) => {
             const admin = [...players].find(p => p.socketID === socket.id && p.role === "admin");
             if (admin && typeof admin.kickUser === "function") {
                 admin.kickUser(targetSocketID, roomManager.rooms, room);
-            } else {
+            } 
+            else {
                 throw new Error("Not authorized or kickUser function not found");
             }
         } catch (error) {
@@ -233,6 +235,16 @@ io.on("connection", (socket) => {
             socket.emit("error", { message: "Failed to kick user" });
         }
     });
+ 
+    socket.on("followUser", ({follower, followee, room})=>{
+        console.log(followee, follower);
+        try{
+            io.to(room).emit("someOneFollowed", {follower, followee});
+        }
+        catch(error){
+            console.log("Following error", error);
+        }
+    })
 
     socket.on("wordToGuess", ({ word, room }) => {
         try {

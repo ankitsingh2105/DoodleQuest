@@ -147,7 +147,7 @@ export default function Playground() {
         socket.current.on("beginPath", handleBeginPath);
         socket.current.on("updatePlayerList", handleUpdatePlayerList);
         socket.current.on("kicked", handleKickedUser);
-
+        
         return () => {
             socket.current.off("newPlayer");
             socket.current.off("draw", handleDraw);

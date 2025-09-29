@@ -1,15 +1,5 @@
 const mysql = require('mysql2/promise');
 
-// async function main() {
-//   const connection = await mysql.createConnection({
-//     host: 'localhost',
-//     port: 3306,                                                  
-//     user: 'root',                                               
-//     password: 'thechauhan1',                                     
-//     database: 'doodleDB'                                        
-//   });
-//   return connection;
-// }
 async function main() {
   const connection = await mysql.createConnection({
     host: 'database-1.cx8gi0quaphm.ap-south-1.rds.amazonaws.com',

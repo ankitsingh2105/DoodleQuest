@@ -44,6 +44,7 @@ export default function PublicProfile() {
           `${backendLink}/users/followers/${userName}`,
           { withCredentials: true }
         );
+        console.log(" :: ", res.data.followers);
         setFollowers(res.data.followers);
       } catch (err) {
         console.error("Error fetching followers", err);
@@ -76,7 +77,7 @@ export default function PublicProfile() {
       <ToastContainer />
 
       {/* Navigation */}
-      <nav className="bg-white bg-opacity-90 shadow-md sticky top-0 z-5000 p-2 mt-[-40px]">
+      <nav className="bg-white bg-opacity-90 sticky top-0 z-5000 p-2 mt-[-40px]">
         <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
           <div className="flex items-center gap-2">
             <svg
@@ -88,7 +89,7 @@ export default function PublicProfile() {
             >
               <path d="M8.5,3A5.5,5.5 0 0,1 14,8.5C14,9.83 13.53,11.05 12.74,12H21V21H12V12.74C11.05,13.53 9.83,14 8.5,14A5.5,5.5 0 0,1 3,8.5A5.5,5.5 0 0,1 8.5,3M8.5,5A3.5,3.5 0 0,0 5,8.5A3.5,3.5 0 0,0 8.5,12A3.5,3.5 0 0,0 12,8.5A3.5,3.5 0 0,0 8.5,5Z" />
             </svg>
-            <h1 onClick={()=>{ navigate("/")}} className="text-3xl sm:text-5xl font-bold text-indigo-600">
+            <h1 onClick={()=>{ navigate("/")}} className="text-2xl sm:text-3xl font-bold text-indigo-600 hover:cursor-pointer">
               DoodleQuest
             </h1>
           </div>

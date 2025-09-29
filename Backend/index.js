@@ -34,7 +34,6 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/users", userRoutes);
-console.log(userRoutes)
 app.use("/login", loginRoutes);
 app.use("/signup", signupRoutes);
 

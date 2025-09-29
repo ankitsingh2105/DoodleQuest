@@ -74,7 +74,7 @@ router.get("/status", authMiddleWare, (req, res) => {
     }
 });
  
-router.put("/updateAvatar/:userName", authMiddleWare, async (req, response) => {
+router.patch("/updateAvatar/:userName", authMiddleWare, async (req, response) => {
     const connection = await db();
     const { userName } = req.params;
     const { profile_photo_url } = req.body;

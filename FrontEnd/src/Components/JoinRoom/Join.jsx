@@ -167,13 +167,13 @@ const Home = () => {
               rel="noopener noreferrer"
               aria-label="Visit Ankit Chauhan's website"
             >
-              Game by Ankit Chauhan
+              Game by Ankit
             </a>
             {user ? (
               <>
                 <button
                   onClick={() => navigate(`/dashboard/${user}`)}
-                  className="ml-4 text-indigo-600 font-bold p-1 pl-2 pr-2 rounded-2xl hover:cursor-pointer underline"
+                  className="ml-4 text-indigo-600 font-bold p-1 pl-2 pr-2 rounded-2xl hover:cursor-pointer"
                 >
                   Welcome {user}
                 </button>
@@ -209,7 +209,7 @@ const Home = () => {
         <div className="container mx-auto flex flex-col md:flex-row items-center gap-12">
           {/* Left side */}
           <div className="md:w-1/2">
-            <h1 className="text-4xl md:text-6xl font-bold text-indigo-800 mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold text-indigo-600 mb-6">
               Draw, Guess,{" "}
               <span className="text-pink-500 animate-wiggle2">Win!</span>
             </h1>
@@ -367,7 +367,7 @@ const Home = () => {
             name, create a room, and start playing now!
           </p>
           <div className="flex justify-center">
-            <button className="px-8 py-4 bg-white text-indigo-600 font-bold rounded-full text-lg hover:bg-gray-100 transition shadow-lg">
+            <button onClick={()=> {navigate("/login")}} className="px-8 py-4 bg-white text-indigo-600 font-bold rounded-full text-lg hover:bg-gray-100 transition shadow-lg hover:cursor-pointer">
               JOIN NOW!
             </button>
           </div>

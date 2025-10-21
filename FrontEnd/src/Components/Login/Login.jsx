@@ -10,6 +10,7 @@ export default function Login() {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [loggingIn, setLoggingIn] = useState(false);
 
   const handleLogin = async () => {
     if (!userName || !password) {
@@ -17,6 +18,7 @@ export default function Login() {
       return;
     }
     try {
+      setLoggingIn(true);
       const { data } = await axios.post(
         `${backendLink}/login`,
         {
@@ -32,6 +34,7 @@ export default function Login() {
       navigate("/");
     } 
     catch (err) {
+      setLoggingIn(false);
       toast.error("Login failed. Please try again.", { autoClose: 1500 });
     }
   };
@@ -60,7 +63,9 @@ export default function Login() {
             onClick={handleLogin}
             className="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 hover:cursor-pointer"
           >
-            Log In
+            {
+              loggingIn ? <>Logging in ... </> : <>Login</>
+            }
           </button>
         </div>
         <div className="mt-4 flex justify-center align:center flex-col items-center">

@@ -10,18 +10,15 @@ export default function Signup() {
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
+  const [signingIn, setSigningIn] = useState(false);
 
   const handleSignup = async () => {
-    if (!userName || !email || !password || !confirm) {
+    if (!userName || !email || !password) {
       toast.error("Please fill all fields", { autoClose: 1200 });
       return;
     }
-    if (password !== confirm) {
-      toast.error("Passwords do not match", { autoClose: 1200 });
-      return;
-    }
     try {
+      setSigningIn(true);
       const { data } = await axios.post(
         `${backendLink}/signup`,
         {
@@ -39,9 +36,10 @@ export default function Signup() {
       );
       toast.success("Account created! Redirecting...", { autoClose: 1200 });
       navigate("/");
-    } catch (err) {
-      console.log(err);
-      toast.error("Signup failed. Please try again.", { autoClose: 1500 });
+    } 
+    catch (err) {
+      setSigningIn(false);
+      toast.error(err.response.data.message, { autoClose: 1500 });
     }
   };
 
@@ -72,18 +70,13 @@ export default function Signup() {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
-          <input
-            type="password"
-            placeholder="Confirm Password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
           <button
             onClick={handleSignup}
             className="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 hover:cursor-pointer"
           >
-            Sign Up
+            {
+              signingIn ? <>Signing in ... </> : <>SignIn</>
+            }
           </button>
           <div className="mt-4 flex justify-center align:center flex-col items-center">
             <button

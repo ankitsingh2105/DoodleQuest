@@ -44,9 +44,9 @@ export default function PublicProfile() {
           `${backendLink}/users/followers/${userName}`,
           { withCredentials: true }
         );
-        console.log(" :: ", res.data.followers);
         setFollowers(res.data.followers);
-      } catch (err) {
+      } 
+      catch (err) {
         console.error("Error fetching followers", err);
       }
     };

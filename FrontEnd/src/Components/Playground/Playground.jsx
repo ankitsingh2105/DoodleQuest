@@ -39,7 +39,6 @@ export default function Playground() {
         backgroundMusic.current = new Audio('/backgroundMusic.mp3');
         backgroundMusic.current.loop = true;
         backgroundMusic.current.volume = 0.5;
-
     }, [])
 
     let role = sessionStorage.getItem("role");

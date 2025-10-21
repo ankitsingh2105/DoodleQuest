@@ -27,6 +27,7 @@ router.post("/", async (req, res) => {
         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "2h" });
 
         res.cookie("doodlequesttoken", token, {
+            // httpOnly: true,
             secure: true,
             sameSite: "none",
             maxAge: 2 * 60 * 60 * 1000
@@ -39,8 +40,12 @@ router.post("/", async (req, res) => {
         });
     }
     catch (error) {
-        console.error("Error during signup:", error);
-        res.status(500).json({ message: "Internal server error" });
+        console.error("Error during signup:", error.sqlState);
+        let message = "Internal server error";
+        if (error.sqlState === '23000') {
+            message = "Username already taken";
+        }
+        res.status(500).json({ message });
     }
 });
 

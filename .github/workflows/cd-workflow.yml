@@ -13,38 +13,58 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      # Free up disk space before Docker build
+      - name: Free up space
+        run: |
+          echo "Before cleanup:"
+          df -h
+          docker system prune -af || true
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          echo "After cleanup:"
+          df -h
 
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERS_NAME }}" --password-stdin
 
+      # Build the Docker image
       - name: Build Docker image
-        run: docker build -t ankitchauhan21/doodlebackend ./Backend
+        run: docker build -t ankitchauhan21/doodlebackend:latest ./Backend
 
+      # Push to Docker Hub
       - name: Push Docker image
         run: docker push ankitchauhan21/doodlebackend:latest
 
+  # ===========================
+  # 🟢 Deploy to Backend 1
+  # ===========================
   deploy-backend1:
     needs: build
     runs-on: [self-hosted, backEnd1]
     steps:
-      - name: Pull Docker image
+      - name: Pull latest Docker image
         run: docker pull ankitchauhan21/doodlebackend:latest
 
-      - name: Remove old container
+      - name: Stop old container
         run: docker rm -f doodlecontainer || true
 
       - name: Run new container
         run: docker run -d -p 8000:8000 --restart always --name doodlecontainer ankitchauhan21/doodlebackend:latest
 
+  # ===========================
+  # 🟢 Deploy to Backend 2
+  # ===========================
   deploy-backend2:
     needs: build
     runs-on: [self-hosted, backEnd2]
     steps:
-      - name: Pull Docker image
+      - name: Pull latest Docker image
         run: docker pull ankitchauhan21/doodlebackend:latest
 
-      - name: Remove old container
+      - name: Stop old container
         run: docker rm -f doodlecontainer || true
 
       - name: Run new container

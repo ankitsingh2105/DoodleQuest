@@ -35,6 +35,7 @@ export default function Login() {
     } 
     catch (err) {
       setLoggingIn(false);
+      console.log("login error :: " , err);
       toast.error("Login failed. Please try again.", { autoClose: 1500 });
     }
   };

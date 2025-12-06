@@ -57,15 +57,16 @@ jobs:
   # ===========================
   # 🟢 Deploy to Backend 2
   # ===========================
-  deploy-backend2:
-    needs: build
-    runs-on: [self-hosted, backEnd2]
-    steps:
-      - name: Pull latest Docker image
-        run: docker pull ankitchauhan21/doodlebackend:latest
+  # deploy-backend2:
+  #   needs: build
+  #   runs-on: [self-hosted, backEnd2]
+  #   steps:
+  #     - name: Pull latest Docker image
+  #       run: docker pull ankitchauhan21/doodlebackend:latest
 
-      - name: Stop old container
-        run: docker rm -f doodlecontainer || true
+  #     - name: Stop old container
+  #       run: docker rm -f doodlecontainer || true
 
-      - name: Run new container
-        run: docker run -d -p 8000:8000 --restart always --name doodlecontainer ankitchauhan21/doodlebackend:latest
+  #     - name: Run new container
+  #       run: docker run -d -p 8000:8000 --restart always --name doodlecontainer ankitchauhan21/doodlebackend:latest
+

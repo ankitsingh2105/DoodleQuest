@@ -6,13 +6,9 @@ async function main() {
     port: 3306,                                                  
     user: 'admin',                                               
     password: 'newThechauhan1!',                                     
-    database: ''                                        
+    database: 'doodleDB'                                        
   });
   return connection;
 }
-// main().then(connection => {
-//   console.log('MySQL Connected Successfully', connection);
-// }).catch(err => {
-//   console.error('Error connecting to MySQL', err);
-// });
+
 module.exports = main;

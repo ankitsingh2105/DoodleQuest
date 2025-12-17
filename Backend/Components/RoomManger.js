@@ -41,7 +41,8 @@ class RoomManager {
                 allRooms.push(room);
             }
             return allRooms;
-        } catch (error) {
+        }
+        catch (error) {
             console.error(`Error in showRooms: ${error.message}`);
             return [];
         }
@@ -59,12 +60,13 @@ class RoomManager {
             const newPlayer = new PlayerClass(socket, this.io, socket.id, name, room, role, ready);
             this.rooms.get(room).add(newPlayer);
             newPlayer.newPlayerJoin(this.rooms);
-        } catch (error) {
+        }
+        catch (error) {
             console.error(`Error in joinRoom for ${socket?.id}: ${error.message}`);
         }
     }
 
-    updatePlayerPoints({ playerID, name, drawTime, room, isReady }) {
+    updatePlayerPoints({ playerID, drawTime, room }) {
         try {
             if (!playerID || !room || drawTime == null) throw new Error("Missing required parameters");
             const players = this.rooms.get(room);
@@ -78,7 +80,8 @@ class RoomManager {
             }
 
             this.io.to(room).emit("updatePlayerList", Array.from(players).map(p => p.toJSON()));
-        } catch (error) {
+        }
+        catch (error) {
             console.error(`Error in updatePlayerPoints for ${playerID}: ${error.message}`);
         }
     }

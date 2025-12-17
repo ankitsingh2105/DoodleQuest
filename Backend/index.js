@@ -45,7 +45,8 @@ const io = new Server(server, {
             "https://doodlequest.vercel.app",
             "https://www.doodlequest.vercel.app",
             "https://doodlequest.games",
-            "https://www.doodlequest.games"
+            "https://www.doodlequest.games",
+            "http://10.12.4.205:5173/"
         ], 
         credentials: true,
     },
@@ -138,7 +139,6 @@ io.on("connection", (socket) => {
         try {
             console.log("new user ::", info);
             console.log("Room while i join", roomManager.showRooms());
-            // socket.emit("playerId")
             roomManager.joinRoom(socket, info);
         } 
         catch (error) {
@@ -195,18 +195,19 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("startGame", ({ currentIteration, room, loopCount, customDrawTime, difficulty }) => {
+    socket.on("startGame", ({ playerIndex, room, customDrawTime, difficulty }) => {
         try {
-            logger.info(`Received startGame from ${socket.id}: ${currentIteration}`);
+            logger.info(`Received startGame from ${socket.id}: ${playerIndex}`);
             const players = roomManager.rooms.get(room);
             if (!players) {
                 throw new Error("Room not found");
             }
 
             const admin = [...players].find(p => p.socketID === socket.id && p.role === "admin");
-            if (admin && typeof admin.startGame === "function") {
-                admin.startGame(currentIteration, room, loopCount, customDrawTime, difficulty);
-            } else {
+            if (admin) {
+                admin.startGame(playerIndex, room, customDrawTime, difficulty);
+            } 
+            else {
                 throw new Error("Not authorized or startGame function not found");
             }
         } catch (error) {
@@ -223,7 +224,7 @@ io.on("connection", (socket) => {
             }
 
             const admin = [...players].find(p => p.socketID === socket.id && p.role === "admin");
-            if (admin && typeof admin.kickUser === "function") {
+            if (admin) {
                 admin.kickUser(targetSocketID, roomManager.rooms, room);
             } 
             else {
@@ -257,10 +258,11 @@ io.on("connection", (socket) => {
 
     socket.on("updatePlayerPoints", (info) => {
         try {
-            const { name, drawTime, room, playerID, isReady } = info;
+            const { name, drawTime, room, playerID } = info;
             roomManager.updatePlayerPoints(info);
             io.to(room).emit("playerGotRightAnswer", { name, playerWithCorrectAnswer: playerID, drawTime });
-        } catch (error) {
+        } 
+        catch (error) {
             logger.error(`Error in updatePlayerPoints event: ${error.message}`, { stack: error.stack });
             socket.emit("error", { message: "Failed to update player points" });
         }

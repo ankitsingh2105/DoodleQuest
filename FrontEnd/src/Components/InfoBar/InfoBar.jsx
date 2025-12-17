@@ -1,9 +1,10 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useRef, useState, useEffect } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function InfoBar(props) {
-  const { playerID, socket, player, name, setplayer, room, setDisableCanvas } = props;
+  const { playerID, socket, player, name, setplayer, room, setDisableCanvas } =
+    props;
   const [answer, setAnswer] = useState("");
   const [item, setItem] = useState("");
   const [random, setrandom] = useState(0);
@@ -14,14 +15,13 @@ export default function InfoBar(props) {
   const [disableStart, setStartDisable] = useState(false);
   const [disableReady, setReadyDisable] = useState(false);
   const [customDrawTime, setCustomDrawTime] = useState(25);
-  const [difficulty, setDifficulty] = useState('Easy');
+  const [difficulty, setDifficulty] = useState("Easy");
   const [isReady, setIsReady] = useState(false);
   const playerIDRef = useRef(playerID);
 
   useEffect(() => {
     playerIDRef.current = playerID;
   }, [playerID]);
-
 
   const questions = useRef(null);
   const whoDrawingNow = useRef(null);
@@ -34,22 +34,22 @@ export default function InfoBar(props) {
       { 1: "lamp", 2: "elephant", 3: "fox" },
       { 1: "guitar", 2: "harp", 3: "instrument" },
       { 1: "kite", 2: "valley", 3: "lamp" },
-      { 1: "tree", 2: "notebook", 3: "ocean" }
+      { 1: "tree", 2: "notebook", 3: "ocean" },
     ],
     Medium: [
       { 1: "pineapple", 2: "giraffe", 3: "trumpet" },
       { 1: "compass", 2: "kangaroo", 3: "violin" },
       { 1: "umbrella", 2: "mountain", 3: "piano" },
       { 1: "bicycle", 2: "river", 3: "flute" },
-      { 1: "bridge", 2: "laptop", 3: "desert" }
+      { 1: "bridge", 2: "laptop", 3: "desert" },
     ],
     Hard: [
       { 1: "rhinoceros", 2: "saxophone", 3: "microscope" },
       { 1: "glacier", 2: "telescope", 3: "helicopter" },
       { 1: "volcano", 2: "submarine", 3: "chandelier" },
       { 1: "waterfall", 2: "skyscraper", 3: "typewriter" },
-      { 1: "cathedral", 2: "spaceship", 3: "windmill" }
-    ]
+      { 1: "cathedral", 2: "spaceship", 3: "windmill" },
+    ],
   };
 
   const role = sessionStorage.getItem("role");
@@ -74,17 +74,19 @@ export default function InfoBar(props) {
     return new Promise((resolve) => setTimeout(resolve, customDrawTime * 1000));
   }
 
-
   useEffect(() => {
-    const handleAcknowledgement = async ({ currentIteration, loopCount, customDrawTime, difficulty }) => {
+    const handlestartGame = async ({
+      playerIndex,
+      customDrawTime,
+      difficulty,
+    }) => {
       setStartDisable(true);
       setReadyDisable(true);
       setCustomDrawTime(customDrawTime);
       setDifficulty(difficulty);
-      const currentPlayer = player[currentIteration];
+      const currentPlayer = player[playerIndex];
       setrandom(Math.floor(Math.random() * 5));
-
-      if (currentPlayer?.name === name) {
+      if (currentPlayer?.socketID === socket.id) {
         setCountdown(5);
         setDrawTime(customDrawTime);
         whoDrawingNow.current.style.display = "none";
@@ -92,23 +94,23 @@ export default function InfoBar(props) {
         setInputDisable(true);
         setDisableCanvas(false);
         await chooseWordWait();
-      }
+      } 
       else {
         setDrawTime(customDrawTime);
-        setPlayerDrawing(currentPlayer?.name || '');
+        setPlayerDrawing(currentPlayer?.name || "");
         whoDrawingNow.current.style.display = "flex";
         setInputDisable(false);
         setDisableCanvas(true);
       }
     };
 
-    socket.on('acknowledgement', handleAcknowledgement);
-    return () => socket.off('acknowledgement', handleAcknowledgement);
+    socket.on("startGame", handlestartGame);
+    return () => socket.off("startGame", handlestartGame);
   }, [player, name, customDrawTime]);
 
   const StartGame = async () => {
     let numberOfReady = 0;
-    player.forEach(element => {
+    player.forEach((element) => {
       if (element.ready == true) numberOfReady++;
     });
     if (numberOfReady + 1 != player.length) {
@@ -117,43 +119,57 @@ export default function InfoBar(props) {
     }
     setInputDisable(false);
     setDisableCanvas(false);
-    let loopCount = player.length;
-    if (loopCount == 1) {
+    let numberOfPlayers = player.length;
+    if (numberOfPlayers == 1) {
       toast.error("Waiting for other players!", { autoClose: 1000 });
       return;
     }
-    let currentIteration = 0;
-    socket.emit('startGame', { currentIteration, room, customDrawTime, difficulty });
+    let playerIndex = 0;
+    socket.emit("startGame", {
+      playerIndex,
+      room,
+      customDrawTime,
+      difficulty,
+    });
 
     const interval = setInterval(async () => {
-      if (currentIteration < loopCount - 1) {
-        currentIteration++;
-        socket.emit('startGame', { currentIteration, room, customDrawTime, difficulty });
+      if (playerIndex < numberOfPlayers - 1) {
+        playerIndex++;
+        socket.emit("startGame", {
+          playerIndex,
+          room,
+          customDrawTime,
+          difficulty,
+        });
         setInputDisable(false);
         setDisableCanvas(false);
-      }
-      else {
+      } else {
         setInputDisable(false);
         setDisableCanvas(false);
         clearInterval(interval);
-        socket.emit('gameOver', { room });
+        socket.emit("gameOver", { room });
       }
     }, customDrawTime * 1000);
   };
 
   const PlayerReady = () => {
     setIsReady(!isReady);
-    socket.emit("playerReady", ({ playerID, isReady, room, name }))
-  }
+    socket.emit("playerReady", { playerID, isReady, room, name });
+  };
 
   const handleEnter = async (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       if (item === answer) {
         correct_answer.play();
-        socket.emit("updatePlayerPoints", { name, drawTime, room, playerID, isReady });
+        socket.emit("updatePlayerPoints", {
+          name,
+          drawTime,
+          room,
+          playerID,
+          isReady,
+        });
         setInputDisable(true);
-      }
-      else {
+      } else {
         incorrect_answer.play();
         toast.error(`Wrong Guess`, { autoClose: 1000 });
       }
@@ -162,7 +178,7 @@ export default function InfoBar(props) {
 
   const handleGuesstingWord = async (word) => {
     setItem(word);
-  }
+  };
 
   useEffect(() => {
     socket.on("wordToGuess", handleGuesstingWord);
@@ -170,7 +186,7 @@ export default function InfoBar(props) {
   }, [item, socket]);
 
   useEffect(() => {
-    socket.on('updatePlayerPoints', ({ players }) => {
+    socket.on("updatePlayerPoints", ({ players }) => {
       setplayer(players);
     });
 
@@ -178,24 +194,30 @@ export default function InfoBar(props) {
       setStartDisable(false);
       setReadyDisable(false);
       whoDrawingNow.current.style.display = "none";
-    })
+    });
 
-    socket.on("playerGotRightAnswer", ({ name, playerWithCorrectAnswer, drawTime }) => {
-      if (playerIDRef.current === playerWithCorrectAnswer) {
-        toast.success(`You got the right answer in ${drawTime}`, { autoClose: 2000 });
-        correct_answer.play();
+    socket.on(
+      "playerGotRightAnswer",
+      ({ name, playerWithCorrectAnswer, drawTime }) => {
+        if (playerIDRef.current === playerWithCorrectAnswer) {
+          toast.success(`You got the right answer in ${drawTime}`, {
+            autoClose: 2000,
+          });
+          correct_answer.play();
+        } else {
+          toast.success(`${name} got the right answer in ${drawTime}`, {
+            autoClose: 2000,
+          });
+          correct_answer.play();
+        }
       }
-      else {
-        toast.success(`${name} got the right answer in ${drawTime}`, { autoClose: 2000 });
-        correct_answer.play();
-      }
-    })
+    );
 
     return () => {
-      socket.off('updatePlayerPoints');
-      socket.off('gameOver');
-      socket.off("playerGotRightAnswer")
-    }
+      socket.off("updatePlayerPoints");
+      socket.off("gameOver");
+      socket.off("playerGotRightAnswer");
+    };
   }, [socket]);
 
   const handleWordSelect = (num) => {
@@ -223,14 +245,10 @@ export default function InfoBar(props) {
 
       {/* infobar */}
 
-      <div className="flex flex-col sm:flex-row items-center justify-around gap-5 md:gap-80 p-0.5">
+      <div className="flex flex-col sm:flex-row items-center justify-around gap-5 md:gap-60 p-0.5">
         <section className="flex text-xl font-bold text-indigo-600 items-center">
-          <div className='mr-3 text-pink-500'>
-            DrawTime
-          </div>
-          <div>
-            {drawTime}
-          </div>
+          <div className="mr-3 text-pink-500">DrawTime</div>
+          <div>{drawTime}</div>
         </section>
 
         <input
@@ -243,40 +261,42 @@ export default function InfoBar(props) {
           className="font-normal border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400 w-70 p-2"
         />
 
-        {
-          role == "admin" ?
-            <button
-              onClick={StartGame}
-              className="px-4 py-2 text-white rounded-md font-bold"
-              style={{ backgroundColor: 'oklch(65.6% 0.241 354.308)' }}
-              disabled={disableStart}
-            >
-              Start
-            </button>
-            :
-            <button
-              onClick={PlayerReady}
-              className="px-4 py-2 text-white rounded-md font-bold"
-              style={{ backgroundColor: 'oklch(65.6% 0.241 354.308)' }}
-              disabled={disableReady}
-            >
-              Ready
-            </button>
-        }
-
+        {role == "admin" ? (
+          <button
+            onClick={StartGame}
+            className="px-4 py-2 text-white rounded-md font-bold"
+            style={{ backgroundColor: "oklch(65.6% 0.241 354.308)" }}
+            disabled={disableStart}
+          >
+            {
+              disableStart ? "Game in Progress" : "Start Game"
+            }
+          </button>
+        ) : (
+          <button
+            onClick={PlayerReady}
+            className="px-4 py-2 text-white rounded-md font-bold"
+            style={{ backgroundColor: "oklch(65.6% 0.241 354.308)" }}
+            disabled={disableReady}
+          >
+            {
+              isReady ? "Unready" : "Ready"
+            }
+          </button>
+        )}
       </div>
 
       {/* Admin controls */}
 
-      <div className={`flex flex-col sm:flex-row items-center justify-around p-4 rounded-2xl mt-3 w-full ${role != "admin" ? "hidden" : "bg-pink-100"} gap-5 md:gap-30`}>
-        <section className="text-blue-600">
-          Admin Controls
-        </section>
+      <div
+        className={`flex flex-col sm:flex-row items-center justify-around p-4 rounded-2xl mt-3 w-full ${
+          role != "admin" ? "hidden" : "bg-pink-100"
+        } gap-5 md:gap-30`}
+      >
+        <section className="text-blue-600">Admin Controls</section>
 
         <section className="flex justify-center items-center gap-1">
-          <div className='mr-3 text-pink-500 font-bold'>
-            Set draw time
-          </div>
+          <div className="mr-3 text-pink-500 font-bold">Set draw time</div>
           <div>
             <input
               type="text"
@@ -287,10 +307,8 @@ export default function InfoBar(props) {
           </div>
         </section>
 
-        <section className='flex justify-center items-center gap-1'>
-          <div className='text-blue-600'>
-            Set Difficulty
-          </div>
+        <section className="flex justify-center items-center gap-1">
+          <div className="text-blue-600">Set Difficulty</div>
           <select
             value={difficulty}
             onChange={handleDifficultyChange}
@@ -314,7 +332,9 @@ export default function InfoBar(props) {
             {[1, 2, 3].map((num) => (
               <div
                 key={num}
-                onClick={() => { handleWordSelect(num) }}
+                onClick={() => {
+                  handleWordSelect(num);
+                }}
                 className="cursor-pointer px-4 py-2 rounded-md text-black font-medium border-2 border-pink-400 border-dashed"
               >
                 {wordArray[difficulty][random][num]}

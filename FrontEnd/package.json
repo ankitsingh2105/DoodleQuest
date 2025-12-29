@@ -21,7 +21,6 @@
     "react-toastify": "^10.0.5",
     "socket.io-client": "^4.7.5",
     "tailwindcss": "^4.1.4",
-    "uniqid": "^5.4.0",
     "vercel": "^34.2.6"
   },
   "devDependencies": {

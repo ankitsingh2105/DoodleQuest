@@ -4,7 +4,6 @@ import "./Join.css";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import backendLink from "../../../backendlink";
-import uniqid from "uniqid";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -21,7 +20,8 @@ const Home = () => {
 
         setUser(res.data.userName);
         setuserName(res.data.userName);
-      } catch (err) {
+      } 
+      catch (err) {
         setUser(null);
       }
     }
@@ -85,30 +85,10 @@ const Home = () => {
       return;
     }
 
-    // if (!room) {
-    //   toast.error("Please enter a room ID to join!", { autoClose: 1000 });
-    //   return;
-    // }
-    const roomID = uniqid.time();
-    try {
-      await axios.post(
-        `${backendLink}/users/addGame`,
-        {
-          userName,
-          role: "admin",
-          room_id: roomID,
-        },
-        {
-          withCredentials: true,
-        }
-      );
-    } catch (error) {
-      console.log(error);
+    if (!room) {
+      toast.error("Please enter a room ID to join!", { autoClose: 1000 });
+      return;
     }
-    navigate(`/room?roomID=${roomID}&name=${userName}`);
-
-    return;
-
     try {
       const response = await axios.get(
         `${backendLink}/allRooms?roomID=${room}`
@@ -271,16 +251,6 @@ const Home = () => {
                       Join Room
                     </div>
                   </button>
-                </div>
-              </div>
-            </div>
-            <br />
-            <div className="bg-white p-6 rounded-xl shadow-md border-4 border-dashed border-indigo-500">
-              <h3 className="text-xl font-bold text-indigo-800 mb-4">
-                Create a room
-              </h3>
-              <div className="space-y-4">
-                <div className="flex gap-4">
                   <button
                     onClick={handleCreateRoom}
                     className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition shadow-md"
@@ -397,12 +367,7 @@ const Home = () => {
             name, create a room, and start playing now!
           </p>
           <div className="flex justify-center">
-            <button
-              onClick={() => {
-                navigate("/login");
-              }}
-              className="px-8 py-4 bg-white text-indigo-600 font-bold rounded-full text-lg hover:bg-gray-100 transition shadow-lg hover:cursor-pointer"
-            >
+            <button onClick={()=> {navigate("/login")}} className="px-8 py-4 bg-white text-indigo-600 font-bold rounded-full text-lg hover:bg-gray-100 transition shadow-lg hover:cursor-pointer">
               JOIN NOW!
             </button>
           </div>

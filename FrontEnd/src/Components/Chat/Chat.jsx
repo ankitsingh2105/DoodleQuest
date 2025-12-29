@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import "./Chat.css"
+import { useEffect, useState } from "react";
+import { Copy } from "lucide-react";
+import "./Chat.css";
+import { toast } from "react-toastify";
 
 export default function Chat({ name, room, socket }) {
   const [message, setMessage] = useState("");
@@ -23,9 +25,23 @@ export default function Chat({ name, room, socket }) {
     setMessage("");
   };
 
+  const handleCopyRoomID = async () =>{
+    try{
+      await navigator.clipboard.writeText(room);
+      toast.success("RoomID copied", {autoClose : 800})
+    }
+    catch(error){
+      toast.error("Failed to copy roomID",  {autoClose : 800})
+    }
+
+  }
+
   useEffect(() => {
     const handleMessages = ({ name, message, time }) => {
-      setAllMessages((currentMessages) => [...currentMessages, { name, message, time }]);
+      setAllMessages((currentMessages) => [
+        ...currentMessages,
+        { name, message, time },
+      ]);
     };
 
     socket.on("receiveMessage", handleMessages);
@@ -34,27 +50,35 @@ export default function Chat({ name, room, socket }) {
 
   return (
     <div className="flex flex-col h-full border-4 rounded-2xl border-dashed border-pink-400 shadow-md bg-white">
-
       {/* Chat Header */}
       <div className="bg-indigo-600 text-white px-6 py-4 border-4 rounded-2xl">
         <h1 className="text-xl font-bold">Chats</h1>
-        <div className="text-sm opacity-75">Room: {room}</div>
+        <div className="flex" onClick={handleCopyRoomID}>
+          <b className="text-sm opacity-75 mr-4">Copy RoomID</b>
+          <Copy color="white" />
+        </div>
       </div>
 
       {/* Messages Container */}
       <div className="overflow-auto heigh p-4 flex flex-col-reverse h-100">
-        {allMessages.slice().reverse().map((msg, index) => (
-          <div
-            key={index}
-            className={`p-2 mb-1 rounded-md ${index % 2 === 0 ? 'bg-gray-100' : 'bg-green-100'
+        {allMessages
+          .slice()
+          .reverse()
+          .map((msg, index) => (
+            <div
+              key={index}
+              className={`p-2 mb-1 rounded-md ${
+                index % 2 === 0 ? "bg-gray-100" : "bg-green-100"
               } flex justify-between items-center`}
-          >
-            <div className="text-sm">
-              <strong>{msg.name}:</strong> {msg.message}
+            >
+              <div className="text-sm">
+                <strong>{msg.name}:</strong> {msg.message}
+              </div>
+              <div className="text-xs text-green-600 font-bold ml-4 whitespace-nowrap">
+                {msg.time}
+              </div>
             </div>
-            <div className="text-xs text-green-600 font-bold ml-4 whitespace-nowrap">{msg.time}</div>
-          </div>
-        ))}
+          ))}
       </div>
 
       {/* Message Input */}

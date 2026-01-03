@@ -84,37 +84,13 @@ const Home = () => {
       });
       return;
     }
-
-    // if (!room) {
-    //   toast.error("Please enter a room ID to join!", { autoClose: 1000 });
-    //   return;
-    // }
-    const roomID = uniqid.time();
-    try {
-      await axios.post(
-        `${backendLink}/users/addGame`,
-        {
-          userName,
-          role: "admin",
-          room_id: roomID,
-        },
-        {
-          withCredentials: true,
-        }
-      );
-    } catch (error) {
-      console.log(error);
-    }
-    navigate(`/room?roomID=${roomID}&name=${userName}`);
-
-    return;
-
+    const roomID = uniqid();
     try {
       const response = await axios.get(
-        `${backendLink}/allRooms?roomID=${room}`
+        `${backendLink}/allRooms?roomID=${roomID}`
       );
       const existingRooms = response.data.rooms;
-      if (existingRooms.includes(room)) {
+      if (existingRooms.includes(roomID)) {
         toast.error("Room ID already taken! Please choose a different one.", {
           autoClose: 1500,
         });
@@ -126,14 +102,15 @@ const Home = () => {
           {
             userName,
             role: "admin",
-            room_id: room,
+            room_id: roomID,
           },
           {
             withCredentials: true,
           }
         );
-      } catch (error) {
-        // console.log(error);
+      } 
+      catch (error) {
+        return;
       }
       navigate(`/room?roomID=${room}&name=${userName}`);
       sessionStorage.setItem("role", "admin");

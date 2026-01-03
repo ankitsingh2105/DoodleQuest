@@ -112,7 +112,7 @@ const Home = () => {
       catch (error) {
         return;
       }
-      navigate(`/room?roomID=${room}&name=${userName}`);
+      navigate(`/room?roomID=${roomID}&name=${userName}`);
       sessionStorage.setItem("role", "admin");
     } catch (err) {
       toast.error("Error checking room existence. Please try again.", {
